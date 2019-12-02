@@ -12,7 +12,7 @@ The motiviation for this library was too many late nights committing an ARM temp
 "name": "[concat('storage', uniqueString(resourceGroup().id))]"
 ```
 
-and pushing it through my build and deployment pipeline only to find out 5 minutes later that I'd missed a ')' somwhere in the expression, or misspelled a built-in function name.
+and pushing it through my build and deployment pipeline only to find out 5 minutes later that I'd missed a ')' somewhere in the expression, or misspelled a built-in function name.
 
 Current Status
 --------------
