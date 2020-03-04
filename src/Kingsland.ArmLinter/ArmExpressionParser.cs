@@ -20,6 +20,11 @@ namespace Kingsland.ArmLinter
             var stream = new TokenStream(tokens);
             var program = ArmExpressionParser.ParseArmExpressionAst(stream);
 
+            if (!stream.Eof)
+            {
+                throw new InvalidOperationExcpetion("End of expression expected.");
+            }
+
             return program;
 
         }

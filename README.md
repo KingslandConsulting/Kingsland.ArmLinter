@@ -17,28 +17,26 @@ and pushing it through my build and deployment pipeline only to find out 5 minut
 Current Status
 --------------
 
-The project can be used to lex all of the expressions in a template (see the ```Kingsland.ArmValidator``` project) but it won't yet parse them.
+The project can be used to lex and parse all of the expressions in a deployment template (see the ```Kingsland.ArmValidator``` project for an example).
 
-This means, for example, you can currently detect unmatched quotes in strings (e.g. ```'storage```) because the lexer will thrown an exception:
+You can currently detect the following types of errors:
 
-```
-"name": "[concat('storage)]"
-```
++ ```[concat('storage)]``` - mismatched quotes in strings
++ ```[concat('storage']``` - mismatched brackets:
++ ```[concat()'storage']``` - unexpected token sequences
 
-But it won't detect unmatched brackets (e.g. ```('storage'```) unless you analyse the lexer tokens yourself:
+At present, it won't validate the argument signature of functions - e.g.
 
-```
-"name": "[concat('storage']"
-```
++ ```toLower('value1', 'value2')``` - too many arguments
++ ```toLower(100)``` - incorrect argument type
 
 Roadmap
 -------
 
 This project still currently a bit of a work in progress - here's the things it still needs...
 
-| Target           |   Progress  |
-| ---------------- | ----------- |
-| Write the lexer  |    Done!    |
-| Write the parser | Not Started |
-
-(Ultimately I'd love to learn how to make this a Visual Studio Code plugin, but baby steps...)
+| Target            |   Progress  |
+| ----------------- | ----------- |
+| Write the lexer   |    Done!    |
+| Write the parser  |    Done!    |
+| Write an analyzer | Not Started |
