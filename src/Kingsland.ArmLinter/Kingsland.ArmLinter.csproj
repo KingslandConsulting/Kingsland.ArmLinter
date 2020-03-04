@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Kingsland.Lexing\Kingsland.Lexing.csproj" />
+    <ProjectReference Include="..\..\..\Kingsland.ParseFx\src\Kingsland.ParseFx\Kingsland.ParseFx.csproj" />
   </ItemGroup>
 
 </Project>

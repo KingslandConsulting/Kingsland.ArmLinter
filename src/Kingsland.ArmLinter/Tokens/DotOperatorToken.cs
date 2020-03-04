@@ -1,5 +1,5 @@
-﻿using Kingsland.Lexing;
-using Kingsland.Lexing.Text;
+﻿using Kingsland.ParseFx.Lexing;
+using Kingsland.ParseFx.Lexing.Text;
 
 namespace Kingsland.ArmLinter.Tokens
 {

@@ -61,11 +61,17 @@ namespace Kingsland.ArmLinter
             return (@char >= '\u0061') && (@char <= '\u007A');
         }
 
-        public static bool IsIdentifierChar(char value)
+        public static bool IsFirstIdentifierChar(char value)
         {
             return (value == '_') ||
                    ArmStringValidator.IsUpperAlpha(value) ||
                    ArmStringValidator.IsLowerAlpha(value);
+        }
+
+        public static bool IsNextIdentifierChar(char value)
+        {
+            return ArmStringValidator.IsFirstIdentifierChar(value) ||
+                   ArmStringValidator.IsDigit(value);
         }
 
         public static bool IsDigit(char value)

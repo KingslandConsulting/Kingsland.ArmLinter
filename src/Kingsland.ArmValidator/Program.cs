@@ -7,19 +7,39 @@ using System.Linq;
 
 namespace Kingsland.ArmValidator
 {
+
     class Program
     {
+
+        private const string JsonSchemaDeploymentTemplate = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#";
+        private const string JsonSchemaDeploymentParameters = "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#";
+
+
         static void Main()
         {
 
             var armDir = "C:\\src\\github\\Azure\\azure-quickstart-templates";
             var armFiles = Directory.GetFiles(armDir, "*.json", SearchOption.AllDirectories);
 
+            var armLexer = ArmExpressionLexer.Create();
+
             foreach (var armFile in armFiles)
             {
 
                 var armText = File.ReadAllText(armFile);
                 var armJson = JToken.Parse(armText);
+
+                var schema = armJson.Value<string>("$schema");
+                switch (schema)
+                {
+                    case Program.JsonSchemaDeploymentTemplate:
+                        break;
+                    case Program.JsonSchemaDeploymentParameters:
+                        continue;
+                    default:
+                        continue;
+                }
+
                 var armTokens = Program.VisitTokens(armJson)
                                        .Where(t => t.Type == JTokenType.String)
                                        .Select(t => (JValue)t)
@@ -28,9 +48,18 @@ namespace Kingsland.ArmValidator
 
                 foreach (var armToken in armTokens)
                 {
-                    var text = armToken.Value<string>();
-                    Console.WriteLine(text);
-                    var tokens = ArmExpressionLexer.Lex(text);
+                    var armExpression = armToken.Value<string>();
+                    if (armExpression.StartsWith("["))
+                    {
+                        armExpression = armExpression.Substring(1);
+                    }
+                    if (armExpression.EndsWith("]"))
+                    {
+                        armExpression = armExpression.Substring(0, armExpression.Length - 1);
+                    }
+                    Console.WriteLine(armExpression);
+                    var tokens = armLexer.Lex(armExpression);
+                    var ast = ArmExpressionParser.Parse(tokens);
                     foreach (var token in tokens)
                     {
                         Console.WriteLine($"    {token.Extent.Text}");
