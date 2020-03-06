@@ -3,7 +3,6 @@
 
     public abstract class ArmExpressionAst : ArmSyntaxNodeAst
     {
-
     }
 
 }

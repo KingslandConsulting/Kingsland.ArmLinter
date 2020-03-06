@@ -22,6 +22,17 @@ namespace Kingsland.ArmLinter.Ast
             private set;
         }
 
+        public override string ToArmText()
+        {
+            switch (this.Token)
+            {
+                case IntegerToken integerToken:
+                    return integerToken.Value.ToString();
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
     }
 
 }

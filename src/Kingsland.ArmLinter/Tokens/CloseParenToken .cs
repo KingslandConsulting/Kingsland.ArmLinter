@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class CloseParenToken : Token
     {
 
+        public CloseParenToken()
+            : this(SourceExtent.Empty)
+        {
+        }
+
         public CloseParenToken(SourceExtent extent)
             : base(extent)
         {

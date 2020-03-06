@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace Kingsland.ArmLinter.Ast
 {
@@ -41,6 +42,19 @@ namespace Kingsland.ArmLinter.Ast
         {
             get;
             private set;
+        }
+
+        public override string ToArmText()
+        {
+            var result = new StringBuilder();
+            result.Append('[');
+            for (var i = 0; i < this.ArgumentList.Count; i++)
+            {
+                if (i > 0) { result.Append(", "); }
+                result.Append(this.ArgumentList[i].ToArmText());
+            }
+            result.Append(']');
+            return result.ToString();
         }
 
     }

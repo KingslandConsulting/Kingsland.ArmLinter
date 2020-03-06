@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Kingsland.ArmLinter.Ast
 {
@@ -29,6 +30,14 @@ namespace Kingsland.ArmLinter.Ast
         {
             get;
             private set;
+        }
+
+        public override string ToArmText()
+        {
+            var result = new StringBuilder();
+            result.Append(this.Expression.ToArmText());
+            result.Append(this.ArgumentList.ToArmText());
+            return result.ToString();
         }
 
     }

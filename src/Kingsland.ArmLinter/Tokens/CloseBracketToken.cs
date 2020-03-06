@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class CloseBracketToken : Token
     {
 
+        public CloseBracketToken()
+            : this(SourceExtent.Empty)
+        {
+        }
+
         public CloseBracketToken(SourceExtent extent)
             : base(extent)
         {

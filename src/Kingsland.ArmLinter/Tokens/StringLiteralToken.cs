@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class StringLiteralToken : Token
     {
 
+        public StringLiteralToken(string value)
+            : this(SourceExtent.Empty, value)
+        {
+        }
+
         public StringLiteralToken(SourceExtent extent, string value)
             : base(extent)
         {

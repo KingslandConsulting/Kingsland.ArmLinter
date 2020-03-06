@@ -8,8 +8,16 @@ using System.Linq;
 namespace Kingsland.ArmLinter
 {
 
-    public sealed class ArmExpressionParser
+    public static class ArmExpressionParser
     {
+
+        public static ArmExpressionAst Parse(string armExpression)
+        {
+            var lexer = ArmExpressionLexer.Create();
+            var tokens = lexer.Lex(armExpression);
+            var ast = ArmExpressionParser.Parse(tokens);
+            return ast;
+        }
 
         public static ArmExpressionAst Parse(IEnumerable<Token> lexerTokens)
         {

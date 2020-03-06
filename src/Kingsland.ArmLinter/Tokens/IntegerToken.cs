@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class IntegerToken : Token
     {
 
+        public IntegerToken(long value)
+            : this(SourceExtent.Empty, value)
+        {
+        }
+
         public IntegerToken(SourceExtent extent, long value)
             : base(extent)
         {

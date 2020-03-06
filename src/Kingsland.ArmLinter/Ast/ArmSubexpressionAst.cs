@@ -17,6 +17,11 @@ namespace Kingsland.ArmLinter.Ast
             private set;
         }
 
+        public override string ToArmText()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 
 }

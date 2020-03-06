@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class OpenParenToken : Token
     {
 
+        public OpenParenToken()
+            : this(SourceExtent.Empty)
+        {
+        }
+
         public OpenParenToken(SourceExtent extent)
             : base(extent)
         {

@@ -1,6 +1,7 @@
 ﻿using Kingsland.ArmLinter.Tokens;
 using Kingsland.ParseFx.Lexing;
 using System;
+using System.Text;
 
 namespace Kingsland.ArmLinter.Ast
 {
@@ -38,6 +39,22 @@ namespace Kingsland.ArmLinter.Ast
         {
             get;
             private set;
+        }
+
+        public override string ToArmText()
+        {
+            var result = new StringBuilder();
+            result.Append(this.Expression.ToArmText());
+            switch (this.OperatorToken)
+            {
+                case DotOperatorToken _:
+                    result.Append(".");
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            result.Append(this.Name.Name);
+            return result.ToString();
         }
 
     }

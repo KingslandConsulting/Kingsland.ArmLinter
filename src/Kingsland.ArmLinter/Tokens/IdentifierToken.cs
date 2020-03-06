@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class IdentifierToken : Token
     {
 
+        public IdentifierToken(string name)
+            : this(SourceExtent.Empty, name)
+        {
+        }
+
         public IdentifierToken(SourceExtent extent, string name)
             : base(extent)
         {

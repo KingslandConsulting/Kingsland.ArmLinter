@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kingsland.ArmValidator", "K
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kingsland.ParseFx", "..\..\Kingsland.ParseFx\src\Kingsland.ParseFx\Kingsland.ParseFx.csproj", "{DCAD5208-D26F-47A4-82A5-9058EA4A0B9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kingsland.ArmLinter.Tests", "Kingsland.ArmLinter.Tests\Kingsland.ArmLinter.Tests.csproj", "{768EB1DE-8105-4035-BDA5-E80DCDE8D845}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DCAD5208-D26F-47A4-82A5-9058EA4A0B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCAD5208-D26F-47A4-82A5-9058EA4A0B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCAD5208-D26F-47A4-82A5-9058EA4A0B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{768EB1DE-8105-4035-BDA5-E80DCDE8D845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{768EB1DE-8105-4035-BDA5-E80DCDE8D845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{768EB1DE-8105-4035-BDA5-E80DCDE8D845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{768EB1DE-8105-4035-BDA5-E80DCDE8D845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

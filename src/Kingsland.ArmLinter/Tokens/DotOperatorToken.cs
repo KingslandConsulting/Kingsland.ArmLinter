@@ -7,6 +7,11 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class DotOperatorToken : Token
     {
 
+        public DotOperatorToken()
+            : this(SourceExtent.Empty)
+        {
+        }
+
         public DotOperatorToken(SourceExtent extent)
             : base(extent)
         {

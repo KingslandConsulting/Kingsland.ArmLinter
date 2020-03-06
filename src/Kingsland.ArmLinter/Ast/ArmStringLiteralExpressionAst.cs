@@ -21,6 +21,11 @@ namespace Kingsland.ArmLinter.Ast
             private set;
         }
 
+        public override string ToArmText()
+        {
+            return $"'{this.Token.Value}'";
+        }
+
     }
 
 }

@@ -204,7 +204,7 @@ namespace Kingsland.ArmLinter
             }
             // return the result
             var extent = SourceExtent.From(sourceChars);
-            return (new WhitespaceToken(extent), thisReader);
+            return (new WhitespaceToken(extent, extent.Text), thisReader);
         }
 
         #endregion
