@@ -1,7 +1,8 @@
 ﻿using Kingsland.ArmLinter.Ast;
 using Kingsland.ArmLinter.Tokens;
-using Kingsland.ParseFx.Lexing;
 using Kingsland.ParseFx.Parsing;
+using Kingsland.ParseFx.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +20,7 @@ namespace Kingsland.ArmLinter
             return ast;
         }
 
-        public static ArmExpressionAst Parse(IEnumerable<Token> lexerTokens)
+        public static ArmExpressionAst Parse(IEnumerable<SyntaxToken> lexerTokens)
         {
 
             // remove all whitespace
@@ -30,7 +31,7 @@ namespace Kingsland.ArmLinter
 
             if (!stream.Eof)
             {
-                throw new InvalidOperationExcpetion("End of expression expected.");
+                throw new InvalidOperationException("End of expression expected.");
             }
 
             return program;
@@ -42,19 +43,14 @@ namespace Kingsland.ArmLinter
         public static ArmExpressionAst ParseArmExpressionAst(TokenStream stream)
         {
             var peek = stream.Peek();
-            switch (peek)
+            return peek switch
             {
-                case OpenParenToken _:
-                    return ArmExpressionParser.ParseArmSubexpressionAst(stream);
-                case IdentifierToken _:
-                    return ArmExpressionParser.ParseDottedNotationExpressionAst(stream);
-                case StringLiteralToken _:
-                    return ArmExpressionParser.ParseArmStringLiteralExpressionAst(stream);
-                case IntegerToken _:
-                    return ArmExpressionParser.ParseArmNumericLiteralExpressionAst(stream);
-                default:
-                    throw new InvalidOperationExcpetion();
-            }
+                OpenParenToken _ => ArmExpressionParser.ParseArmSubexpressionAst(stream),
+                IdentifierToken _ => ArmExpressionParser.ParseDottedNotationExpressionAst(stream),
+                StringLiteralToken _ => ArmExpressionParser.ParseArmStringLiteralExpressionAst(stream),
+                IntegerToken _ => ArmExpressionParser.ParseArmNumericLiteralExpressionAst(stream),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         /// <summary>
@@ -231,15 +227,13 @@ namespace Kingsland.ArmLinter
         public static ArmNumericLiteralExpressionAst ParseArmNumericLiteralExpressionAst(TokenStream stream)
         {
             var peek = stream.Peek();
-            switch (peek)
+            return peek switch
             {
-                case IntegerToken _:
-                    return new ArmNumericLiteralExpressionAst(
-                        stream.Read<IntegerToken>()
-                    );
-                default:
-                    throw new InvalidOperationExcpetion();
-            }
+                IntegerToken _ => new ArmNumericLiteralExpressionAst(
+                                       stream.Read<IntegerToken>()
+                                   ),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         #endregion

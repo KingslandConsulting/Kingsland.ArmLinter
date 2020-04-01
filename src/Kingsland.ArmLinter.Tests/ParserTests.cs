@@ -9,6 +9,27 @@ namespace Kingsland.ArmLinter.Tests
     {
 
         [Test]
+        public static void ParseEmptyString()
+        {
+            var expression = "";
+            var actual = ArmExpressionParser.Parse(expression);
+            var expected = new ArmInvocationExpressionAst(
+                expression: new ArmFunctionReferenceAst(
+                    name: new IdentifierToken("concat")
+                ),
+                argumentList: new ArmArgumentListAst(
+                    openParen: new OpenParenToken(),
+                    arguments: new List<ArmExpressionAst>(),
+                    closeParen: new CloseParenToken()
+                )
+            );
+            ParserHelper.AssertAreEqual(expected, actual);
+            Assert.AreEqual(expression, actual.ToArmText());
+        }
+
+        #region FunctionReference Tests
+
+        [Test]
         public static void ParseFunctionReferenceNoArguments()
         {
             var expression = "concat()";
@@ -75,6 +96,66 @@ namespace Kingsland.ArmLinter.Tests
             ParserHelper.AssertAreEqual(expected, actual);
             Assert.AreEqual(expression, actual.ToArmText());
         }
+
+
+        [Test]
+        public static void ParseFunctionMissingParens()
+        {
+            var expression = "concat";
+            var actual = ArmExpressionParser.Parse(expression);
+            var expected = new ArmInvocationExpressionAst(
+                expression: new ArmFunctionReferenceAst(
+                    name: new IdentifierToken("concat")
+                ),
+                argumentList: new ArmArgumentListAst(
+                    openParen: new OpenParenToken(),
+                    arguments: new List<ArmExpressionAst>(),
+                    closeParen: new CloseParenToken()
+                )
+            );
+            ParserHelper.AssertAreEqual(expected, actual);
+            Assert.AreEqual(expression, actual.ToArmText());
+        }
+
+        [Test]
+        public static void ParseFunctionReferenceMissingParens()
+        {
+            var expression = "concat";
+            var actual = ArmExpressionParser.Parse(expression);
+            var expected = new ArmInvocationExpressionAst(
+                expression: new ArmFunctionReferenceAst(
+                    name: new IdentifierToken("concat")
+                ),
+                argumentList: new ArmArgumentListAst(
+                    openParen: new OpenParenToken(),
+                    arguments: new List<ArmExpressionAst>(),
+                    closeParen: new CloseParenToken()
+                )
+            );
+            ParserHelper.AssertAreEqual(expected, actual);
+            Assert.AreEqual(expression, actual.ToArmText());
+        }
+
+        [Test]
+        public static void ParseFunctionReferenceUnclosedParens()
+        {
+            var expression = "concat(";
+            var actual = ArmExpressionParser.Parse(expression);
+            var expected = new ArmInvocationExpressionAst(
+                expression: new ArmFunctionReferenceAst(
+                    name: new IdentifierToken("concat")
+                ),
+                argumentList: new ArmArgumentListAst(
+                    openParen: new OpenParenToken(),
+                    arguments: new List<ArmExpressionAst>(),
+                    closeParen: new CloseParenToken()
+                )
+            );
+            ParserHelper.AssertAreEqual(expected, actual);
+            Assert.AreEqual(expression, actual.ToArmText());
+        }
+
+        #endregion
 
         [Test()]
         public static void ParseMemberAccess()

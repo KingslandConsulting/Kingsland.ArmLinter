@@ -55,13 +55,13 @@ namespace Kingsland.ArmValidator
                     //armExpression = "[concat('storage']"; // mismatched parens
                     armExpression = "[concat()'storage']"; // unexpected token sequences
 
-                    if (armExpression.StartsWith("["))
+                    if (armExpression.StartsWith("[", StringComparison.InvariantCulture))
                     {
                         armExpression = armExpression.Substring(1);
                     }
-                    if (armExpression.EndsWith("]"))
+                    if (armExpression.EndsWith("]", StringComparison.InvariantCulture))
                     {
-                        armExpression = armExpression.Substring(0, armExpression.Length - 1);
+                        armExpression = armExpression[0..^1];
                     }
                     Console.WriteLine(armExpression);
                     var tokens = armLexer.Lex(armExpression);

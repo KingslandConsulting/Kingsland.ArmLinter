@@ -79,12 +79,13 @@ namespace Kingsland.ArmLinter
             return (value >= '0') && (value <= '9');
         }
 
-        //internal static readonly char[] WhitespaceChars = new[] { '\u0020', '\u0009', '\u000D', '\u000A' };
-        internal static readonly char[] WhitespaceChars = new[] { '\u0020', '\u000D', '\u000A' };
+        private static readonly char[] whitespaceChars = new[] {
+            '\u0020', '\u000D', '\u000A'
+        };
 
         public static bool IsWhitespace(char @char)
         {
-            return ArmStringValidator.WhitespaceChars.Contains(@char);
+            return ArmStringValidator.whitespaceChars.Contains(@char);
         }
 
     }

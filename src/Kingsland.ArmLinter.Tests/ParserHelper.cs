@@ -1,5 +1,6 @@
 ﻿using Kingsland.ArmLinter.Ast;
 using Kingsland.ArmLinter.Tokens;
+using Kingsland.ParseFx.Syntax;
 using NUnit.Framework;
 using System;
 
@@ -87,7 +88,7 @@ namespace Kingsland.ArmLinter.Tests
                 case ArmNumericLiteralExpressionAst expected:
                     {
                         var actual = (ArmNumericLiteralExpressionAst)actualNode;
-                        switch(expected.Token)
+                        switch (expected.Token)
                         {
                             case IntegerToken expectedToken:
                                 Assert.IsInstanceOf(expectedToken.GetType(), actual.Token);
@@ -108,6 +109,33 @@ namespace Kingsland.ArmLinter.Tests
                 default:
                     throw new NotImplementedException(
                         $"Cannot compare expected type '{expectedNode.GetType().Name}' of {nameof(expectedNode)}"
+                    );
+            }
+        }
+
+        public static void AssertAreEqual(SyntaxToken expectedToken, SyntaxToken actualToken)
+        {
+            if ((expectedToken == null) && (actualToken == null))
+            {
+                return;
+            }
+            if (expectedToken == null)
+            {
+                Assert.Fail($"{nameof(expectedToken)} is null, but {nameof(actualToken)} is not null");
+            }
+            if (actualToken == null)
+            {
+                Assert.Fail($"{nameof(expectedToken)} is not null, but {nameof(actualToken)} is null");
+            }
+            Assert.AreEqual(
+                expectedToken.GetType(), actualToken.GetType(),
+                $"{nameof(expectedToken)} type does not match {nameof(actualToken)} type"
+            );
+            switch (expectedToken)
+            {
+                default:
+                    throw new NotImplementedException(
+                        $"Cannot compare expected type '{expectedToken.GetType().Name}' of {nameof(expectedToken)}"
                     );
             }
         }

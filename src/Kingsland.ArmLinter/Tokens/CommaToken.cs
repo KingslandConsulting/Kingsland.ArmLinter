@@ -1,10 +1,10 @@
-﻿using Kingsland.ParseFx.Lexing;
-using Kingsland.ParseFx.Lexing.Text;
+﻿using Kingsland.ParseFx.Syntax;
+using Kingsland.ParseFx.Text;
 
 namespace Kingsland.ArmLinter.Tokens
 {
 
-    public sealed class CommaToken : Token
+    public sealed class CommaToken : SyntaxToken
     {
 
         public CommaToken()

@@ -1,5 +1,5 @@
 ﻿using Kingsland.ArmLinter.Tokens;
-using Kingsland.ParseFx.Lexing;
+using Kingsland.ParseFx.Syntax;
 using System;
 
 namespace Kingsland.ArmLinter.Ast
@@ -11,12 +11,12 @@ namespace Kingsland.ArmLinter.Ast
         /// <summary>
         /// </summary>
         /// <param name="token"></param>
-        public ArmNumericLiteralExpressionAst(Token token)
+        public ArmNumericLiteralExpressionAst(SyntaxToken token)
         {
             this.Token = token ?? throw new ArgumentNullException(nameof(token));
         }
 
-        public Token Token
+        public SyntaxToken Token
         {
             get;
             private set;
@@ -24,13 +24,11 @@ namespace Kingsland.ArmLinter.Ast
 
         public override string ToArmText()
         {
-            switch (this.Token)
+            return this.Token switch
             {
-                case IntegerToken integerToken:
-                    return integerToken.Value.ToString();
-                default:
-                    throw new NotImplementedException();
-            }
+                IntegerToken integerToken => integerToken.Value.ToString(),
+                _ => throw new NotImplementedException(),
+            };
         }
 
     }

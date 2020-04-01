@@ -1,5 +1,5 @@
 ﻿using Kingsland.ArmLinter.Tokens;
-using Kingsland.ParseFx.Lexing;
+using Kingsland.ParseFx.Syntax;
 using System;
 using System.Text;
 
@@ -16,7 +16,7 @@ namespace Kingsland.ArmLinter.Ast
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="name"></param>
-        public ArmMemberAccessExpressionAst(ArmExpressionAst expression, Token operatorToken, IdentifierToken name)
+        public ArmMemberAccessExpressionAst(ArmExpressionAst expression, SyntaxToken operatorToken, IdentifierToken name)
         {
             this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
             this.OperatorToken = operatorToken ?? throw new ArgumentNullException(nameof(operatorToken));
@@ -29,7 +29,7 @@ namespace Kingsland.ArmLinter.Ast
             private set;
         }
 
-        public Token OperatorToken
+        public SyntaxToken OperatorToken
         {
             get;
             private set;

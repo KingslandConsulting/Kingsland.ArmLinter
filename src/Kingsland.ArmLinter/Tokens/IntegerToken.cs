@@ -1,10 +1,10 @@
-﻿using Kingsland.ParseFx.Lexing;
-using Kingsland.ParseFx.Lexing.Text;
+﻿using Kingsland.ParseFx.Syntax;
+using Kingsland.ParseFx.Text;
 
 namespace Kingsland.ArmLinter.Tokens
 {
 
-    public sealed class IntegerToken : Token
+    public sealed class IntegerToken : SyntaxToken
     {
 
         public IntegerToken(long value)

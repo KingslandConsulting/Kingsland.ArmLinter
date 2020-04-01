@@ -1,10 +1,10 @@
-﻿using Kingsland.ParseFx.Lexing;
-using Kingsland.ParseFx.Lexing.Text;
+﻿using Kingsland.ParseFx.Syntax;
+using Kingsland.ParseFx.Text;
 
 namespace Kingsland.ArmLinter.Tokens
 {
 
-    public sealed class CloseBracketToken : Token
+    public sealed class CloseBracketToken : SyntaxToken
     {
 
         public CloseBracketToken()
