@@ -49,12 +49,6 @@ namespace Kingsland.ArmValidator
                 foreach (var armToken in armTokens)
                 {
                     var armExpression = armToken.Value<string>();
-
-                    // test cases for unit tests (eventaully)
-                    //armExpression = "[concat('storage)]";  // mismatched quotes
-                    //armExpression = "[concat('storage']";  // mismatched parens
-                    //armExpression = "[concat()'storage']"; // unexpected token sequences
-
                     if (armExpression.StartsWith("[", StringComparison.InvariantCulture))
                     {
                         armExpression = armExpression.Substring(1);

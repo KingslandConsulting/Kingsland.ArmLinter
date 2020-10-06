@@ -2,6 +2,7 @@ using Kingsland.ArmLinter.Ast;
 using Kingsland.ArmLinter.Tokens;
 using Kingsland.ParseFx.Parsing;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace Kingsland.ArmLinter.Tests
@@ -132,6 +133,45 @@ namespace Kingsland.ArmLinter.Tests
             Assert.AreEqual(expectedMessage, ex.Message);
         }
 
+        [Test]
+        public static void ParseFunctionReferenceUnclosedParensWithParameter()
+        {
+            var expression = "concat('storage'";
+            var ex = Assert.Throws<UnexpectedEndOfStreamException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
+            );
+            var expectedMessage = "Exception of type 'Kingsland.ParseFx.Parsing.UnexpectedEndOfStreamException' was thrown.";
+            Assert.AreEqual(expectedMessage, ex.Message);
+        }
+
+        [Test]
+        public static void ParseFunctionReferenceUnclosedStringQuotes()
+        {
+            var expression = "concat('storage";
+            var ex = Assert.Throws<InvalidOperationException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
+            );
+            var expectedMessage = "Unterminated string found.";
+            Assert.AreEqual(expectedMessage, ex.Message);
+        }
+
+        [Test]
+        public static void ParseFunctionReferenceUnexpectedSequence()
+        {
+            var expression = "concat()'storage'";
+            var ex = Assert.Throws<InvalidOperationException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
+            );
+            var expectedMessage = "End of expression expected.";
+            Assert.AreEqual(expectedMessage, ex.Message);
+        }
+
         #endregion
 
         [Test()]
@@ -196,6 +236,7 @@ namespace Kingsland.ArmLinter.Tests
             ParserHelper.AssertAreEqual(expected, actual);
             Assert.AreEqual(expression, actual.ToArmText());
         }
+
 
     }
 
