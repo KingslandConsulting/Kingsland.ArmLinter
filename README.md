@@ -33,7 +33,7 @@ At present, it won't validate the argument signature of functions - e.g.
 Evaluating
 ----------
 
-The library also supports evaluating a very limited subset of ARM Template functions inside expression strings - for example:
+The library supports evaluating a very limited subset of ARM Template functions inside expression strings - for example:
 
 ```csharp
 ArmExpressionEvaluator.Evaluate("concat('hello', 'brave', 'new', 'world')");
