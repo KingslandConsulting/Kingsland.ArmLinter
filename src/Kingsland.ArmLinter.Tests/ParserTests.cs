@@ -202,7 +202,7 @@ namespace Kingsland.ArmLinter.Tests
         {
             var expression = "providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]";
             var actual = ArmExpressionParser.Parse(expression);
-            var expected = new ArmElementExpressionAst(
+            var expected = new ArmElementAccessExpressionAst(
                 expression: new ArmMemberAccessExpressionAst(
                     expression: new ArmInvocationExpressionAst(
                         expression: new ArmFunctionReferenceAst(

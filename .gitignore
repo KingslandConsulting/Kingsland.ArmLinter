@@ -1,3 +1,10 @@
 .vs
 bin
 obj
+packages
+fusion
+
+*.nupkg
+*.user
+
+build/TestResult.xml
