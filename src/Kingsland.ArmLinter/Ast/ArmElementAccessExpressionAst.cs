@@ -4,7 +4,7 @@ using System.Text;
 namespace Kingsland.ArmLinter.Ast
 {
 
-    public sealed class ArmElementExpressionAst : ArmExpressionAst
+    public sealed class ArmElementAccessExpressionAst : ArmExpressionAst
     {
 
         /// <summary>
@@ -14,7 +14,7 @@ namespace Kingsland.ArmLinter.Ast
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="argumentList"></param>
-        public ArmElementExpressionAst(ArmExpressionAst expression, ArmBracketedArgumentListAst argumentList)
+        public ArmElementAccessExpressionAst(ArmExpressionAst expression, ArmBracketedArgumentListAst argumentList)
         {
             this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
             this.ArgumentList = argumentList ?? throw new ArgumentNullException(nameof(argumentList));

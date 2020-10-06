@@ -14,11 +14,11 @@ namespace Kingsland.ArmValidator
         private const string JsonSchemaDeploymentTemplate = "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#";
         private const string JsonSchemaDeploymentParameters = "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#";
 
-
         static void Main()
         {
 
-            var armDir = "C:\\src\\github\\Azure\\azure-quickstart-templates";
+            //var armDir = "C:\\src\\github\\Azure\\azure-quickstart-templates";
+            var armDir = "C:\\src\\github\\mikeclayton\\azure-quickstart-templates";
             var armFiles = Directory.GetFiles(armDir, "*.json", SearchOption.AllDirectories);
 
             var armLexer = ArmExpressionLexer.Create();
@@ -49,12 +49,6 @@ namespace Kingsland.ArmValidator
                 foreach (var armToken in armTokens)
                 {
                     var armExpression = armToken.Value<string>();
-
-                    // test cases for unit tests (eventaully)
-                    //armExpression = "[concat('storage)]"; // mismatched quotes
-                    //armExpression = "[concat('storage']"; // mismatched parens
-                    armExpression = "[concat()'storage']"; // unexpected token sequences
-
                     if (armExpression.StartsWith("[", StringComparison.InvariantCulture))
                     {
                         armExpression = armExpression.Substring(1);

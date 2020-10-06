@@ -50,9 +50,9 @@ namespace Kingsland.ArmLinter.Tests
                         }
                     }
                     break;
-                case ArmElementExpressionAst expected:
+                case ArmElementAccessExpressionAst expected:
                     {
-                        var actual = (ArmElementExpressionAst)actualNode;
+                        var actual = (ArmElementAccessExpressionAst)actualNode;
                         ParserHelper.AssertAreEqual(expected.Expression, actual.Expression);
                         ParserHelper.AssertAreEqual(expected.ArgumentList, actual.ArgumentList);
                     }

@@ -120,7 +120,7 @@ namespace Kingsland.ArmLinter
                         );
                         break;
                     case OpenBracketToken _:
-                        expression = new ArmElementExpressionAst(
+                        expression = new ArmElementAccessExpressionAst(
                             expression,
                             ArmExpressionParser.ParseArmBracketedArgumentListAst(stream)
                         );

@@ -1,6 +1,5 @@
 ﻿using Kingsland.ArmLinter.Tokens;
 using Kingsland.ParseFx.Lexing;
-using Kingsland.ParseFx.Syntax;
 using Kingsland.ParseFx.Text;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ namespace Kingsland.ArmLinter
                 .AddScanner('.', ArmExpressionLexer.ScanDotOperatorToken)
                 .AddScanner('\'', ArmExpressionLexer.ScanStringLiteralToken)
                 .AddScanner("[a-z|A-z|_]", ArmExpressionLexer.ScanIdentifierToken)
-                .AddScanner("[0-9|-]", ArmExpressionLexer.ScanIntegerToken)
+                .AddScanner("[+|\\-|0-9]", ArmExpressionLexer.ScanIntegerToken)
                 .AddScanner(
                     new char[] { '\u0020', '\u000D', '\u000A' },
                     ArmExpressionLexer.ScanWhitespaceToken
@@ -36,49 +35,49 @@ namespace Kingsland.ArmLinter
 
         #region Token Scanner Methods
 
-        private static (SyntaxToken, SourceReader) ScanOpenBracketToken(SourceReader reader)
+        private static ScannerResult ScanOpenBracketToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read('[');
             var extent = SourceExtent.From(sourceChar);
-            return (new OpenBracketToken(extent), nextReader);
+            return new ScannerResult(new OpenBracketToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanCloseBracketToken(SourceReader reader)
+        private static ScannerResult ScanCloseBracketToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read(']');
             var extent = SourceExtent.From(sourceChar);
-            return (new CloseBracketToken(extent), nextReader);
+            return new ScannerResult(new CloseBracketToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanOpenParenToken(SourceReader reader)
+        private static ScannerResult ScanOpenParenToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read('(');
             var extent = SourceExtent.From(sourceChar);
-            return (new OpenParenToken(extent), nextReader);
+            return new ScannerResult(new OpenParenToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanCloseParenToken(SourceReader reader)
+        private static ScannerResult ScanCloseParenToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read(')');
             var extent = SourceExtent.From(sourceChar);
-            return (new CloseParenToken(extent), nextReader);
+            return new ScannerResult(new CloseParenToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanCommaToken(SourceReader reader)
+        private static ScannerResult ScanCommaToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read(',');
             var extent = SourceExtent.From(sourceChar);
-            return (new CommaToken(extent), nextReader);
+            return new ScannerResult(new CommaToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanDotOperatorToken(SourceReader reader)
+        private static ScannerResult ScanDotOperatorToken(SourceReader reader)
         {
             (var sourceChar, var nextReader) = reader.Read('.');
             var extent = SourceExtent.From(sourceChar);
-            return (new DotOperatorToken(extent), nextReader);
+            return new ScannerResult(new DotOperatorToken(extent), nextReader);
         }
 
-        private static (SyntaxToken, SourceReader) ScanIdentifierToken(SourceReader reader)
+        private static ScannerResult ScanIdentifierToken(SourceReader reader)
         {
             var thisReader = reader;
             var sourceChar = default(SourceChar);
@@ -98,10 +97,12 @@ namespace Kingsland.ArmLinter
             // return the result
             var extent = SourceExtent.From(sourceChars);
             var name = nameChars.ToString();
-            return (new IdentifierToken(extent, name), thisReader);
+            return new ScannerResult(
+                new IdentifierToken(extent, name), thisReader
+            );
         }
 
-        private static (SyntaxToken, SourceReader) ScanIntegerToken(SourceReader reader)
+        private static ScannerResult ScanIntegerToken(SourceReader reader)
         {
             var thisReader = reader;
             var sourceChar = default(SourceChar);
@@ -135,10 +136,12 @@ namespace Kingsland.ArmLinter
             }
             // return the result
             var extent = SourceExtent.From(sourceChars);
-            return (new IntegerToken(extent, sign * value), thisReader);
+            return new ScannerResult(
+                new IntegerToken(extent, sign * value), thisReader
+            );
         }
 
-        private static (SyntaxToken, SourceReader) ScanStringLiteralToken(SourceReader reader)
+        private static ScannerResult ScanStringLiteralToken(SourceReader reader)
         {
             const char SINGLEQUOTE = '\'';
             var thisReader = reader;
@@ -186,10 +189,12 @@ namespace Kingsland.ArmLinter
             // return the result
             var extent = SourceExtent.From(sourceChars);
             var stringValue = stringChars.ToString();
-            return (new StringLiteralToken(extent, stringValue), thisReader);
+            return new ScannerResult(
+                new StringLiteralToken(extent, stringValue), thisReader
+            );
         }
 
-        private static (SyntaxToken, SourceReader) ScanWhitespaceToken(SourceReader reader)
+        private static ScannerResult ScanWhitespaceToken(SourceReader reader)
         {
             var thisReader = reader;
             var sourceChar = default(SourceChar);
@@ -206,7 +211,9 @@ namespace Kingsland.ArmLinter
             // return the result
             var extent = SourceExtent.From(sourceChars);
             var value = extent.ToString();
-            return (new WhitespaceToken(extent, value), thisReader);
+            return new ScannerResult(
+                new WhitespaceToken(extent, value), thisReader
+            );
         }
 
         #endregion
