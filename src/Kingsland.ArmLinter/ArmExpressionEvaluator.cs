@@ -16,7 +16,7 @@ namespace Kingsland.ArmLinter
             return value;
         }
 
-        public static IEnumerable<object> Evaluate(ArmArgumentListAst node)
+        private static IEnumerable<object> Evaluate(ArmArgumentListAst node)
         {
             foreach (var arg in node.ArgumentList)
             {
@@ -24,7 +24,7 @@ namespace Kingsland.ArmLinter
             }
         }
 
-        public static void Evaluate(ArmBracketedArgumentListAst node)
+        private static void Evaluate(ArmBracketedArgumentListAst node)
         {
             throw new NotImplementedException();
         }
@@ -34,7 +34,7 @@ namespace Kingsland.ArmLinter
             throw new NotImplementedException();
         }
 
-        public static object Evaluate(ArmExpressionAst node)
+        private static object Evaluate(ArmExpressionAst node)
         {
             return node switch
             {
@@ -47,19 +47,19 @@ namespace Kingsland.ArmLinter
             };
         }
 
-        public static object Evaluate(ArmFunctionReferenceAst node, ArmArgumentListAst argList)
+        private static object Evaluate(ArmFunctionReferenceAst node, ArmArgumentListAst argList)
         {
+            var args = ArmExpressionEvaluator.Evaluate(argList).ToList();
             switch (node.Name.Name)
             {
                 case "base64":
-                    var inputString = (string)ArmExpressionEvaluator.Evaluate(argList).Single();
+                    var inputString = (string)args.Single();
                     return ArmTemplateFunctions.String.Base64(inputString);
                 case "base64ToString":
-                    var base64Value = (string)ArmExpressionEvaluator.Evaluate(argList).Single();
+                    var base64Value = (string)args.Single();
                     return ArmTemplateFunctions.String.Base64ToString(base64Value);
                 case "concat":
                     // check if this is the <string> or <object[]> version based on the argument types
-                    var args = ArmExpressionEvaluator.Evaluate(argList).ToList();
                     if (args == null)
                     {
                         throw new InvalidOperationException($"Concat args cannot be null.");
@@ -86,12 +86,12 @@ namespace Kingsland.ArmLinter
                     }
                 case "toLower":
                     {
-                        var stringToChange = (string)ArmExpressionEvaluator.Evaluate(argList).Single();
+                        var stringToChange = (string)args.Single();
                         return ArmTemplateFunctions.String.ToLower(stringToChange);
                     }
                 case "toUpper":
                     {
-                        var stringToChange = (string)ArmExpressionEvaluator.Evaluate(argList).Single();
+                        var stringToChange = (string)args.Single();
                         return ArmTemplateFunctions.String.ToUpper(stringToChange);
                     }
                 default:
@@ -99,7 +99,7 @@ namespace Kingsland.ArmLinter
             };
         }
 
-        public static object Evaluate(ArmInvocationExpressionAst node)
+        private static object Evaluate(ArmInvocationExpressionAst node)
         {
             return node.Expression switch
             {
@@ -110,7 +110,7 @@ namespace Kingsland.ArmLinter
             };
         }
 
-        public static void Evaluate(ArmMemberAccessExpressionAst node)
+        private static void Evaluate(ArmMemberAccessExpressionAst node)
         {
             throw new NotImplementedException();
         }
@@ -120,12 +120,12 @@ namespace Kingsland.ArmLinter
             throw new NotImplementedException();
         }
 
-        public static string Evaluate(ArmStringLiteralExpressionAst node)
+        private static string Evaluate(ArmStringLiteralExpressionAst node)
         {
             return node.Token.Value;
         }
 
-        public static void Evaluate(ArmSubexpressionAst node)
+        private static void Evaluate(ArmSubexpressionAst node)
         {
             throw new NotImplementedException();
         }

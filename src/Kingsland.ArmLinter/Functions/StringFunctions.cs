@@ -164,7 +164,6 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-
     }
 
 }
