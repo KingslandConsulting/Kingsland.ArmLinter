@@ -1,5 +1,6 @@
 using Kingsland.ArmLinter.Ast;
 using Kingsland.ArmLinter.Tokens;
+using Kingsland.ParseFx.Parsing;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -12,19 +13,13 @@ namespace Kingsland.ArmLinter.Tests
         public static void ParseEmptyString()
         {
             var expression = "";
-            var actual = ArmExpressionParser.Parse(expression);
-            var expected = new ArmInvocationExpressionAst(
-                expression: new ArmFunctionReferenceAst(
-                    name: new IdentifierToken("concat")
-                ),
-                argumentList: new ArmArgumentListAst(
-                    openParen: new OpenParenToken(),
-                    arguments: new List<ArmExpressionAst>(),
-                    closeParen: new CloseParenToken()
-                )
+            var ex = Assert.Throws<UnexpectedEndOfStreamException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
             );
-            ParserHelper.AssertAreEqual(expected, actual);
-            Assert.AreEqual(expression, actual.ToArmText());
+            var expectedMessage = "Exception of type 'Kingsland.ParseFx.Parsing.UnexpectedEndOfStreamException' was thrown.";
+            Assert.AreEqual(expectedMessage, ex.Message);
         }
 
         #region FunctionReference Tests
@@ -102,57 +97,39 @@ namespace Kingsland.ArmLinter.Tests
         public static void ParseFunctionMissingParens()
         {
             var expression = "concat";
-            var actual = ArmExpressionParser.Parse(expression);
-            var expected = new ArmInvocationExpressionAst(
-                expression: new ArmFunctionReferenceAst(
-                    name: new IdentifierToken("concat")
-                ),
-                argumentList: new ArmArgumentListAst(
-                    openParen: new OpenParenToken(),
-                    arguments: new List<ArmExpressionAst>(),
-                    closeParen: new CloseParenToken()
-                )
+            var ex = Assert.Throws<UnexpectedEndOfStreamException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
             );
-            ParserHelper.AssertAreEqual(expected, actual);
-            Assert.AreEqual(expression, actual.ToArmText());
+            var expectedMessage = "Exception of type 'Kingsland.ParseFx.Parsing.UnexpectedEndOfStreamException' was thrown.";
+            Assert.AreEqual(expectedMessage, ex.Message);
         }
 
         [Test]
         public static void ParseFunctionReferenceMissingParens()
         {
             var expression = "concat";
-            var actual = ArmExpressionParser.Parse(expression);
-            var expected = new ArmInvocationExpressionAst(
-                expression: new ArmFunctionReferenceAst(
-                    name: new IdentifierToken("concat")
-                ),
-                argumentList: new ArmArgumentListAst(
-                    openParen: new OpenParenToken(),
-                    arguments: new List<ArmExpressionAst>(),
-                    closeParen: new CloseParenToken()
-                )
+            var ex = Assert.Throws<UnexpectedEndOfStreamException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
             );
-            ParserHelper.AssertAreEqual(expected, actual);
-            Assert.AreEqual(expression, actual.ToArmText());
+            var expectedMessage = "Exception of type 'Kingsland.ParseFx.Parsing.UnexpectedEndOfStreamException' was thrown.";
+            Assert.AreEqual(expectedMessage, ex.Message);
         }
 
         [Test]
         public static void ParseFunctionReferenceUnclosedParens()
         {
             var expression = "concat(";
-            var actual = ArmExpressionParser.Parse(expression);
-            var expected = new ArmInvocationExpressionAst(
-                expression: new ArmFunctionReferenceAst(
-                    name: new IdentifierToken("concat")
-                ),
-                argumentList: new ArmArgumentListAst(
-                    openParen: new OpenParenToken(),
-                    arguments: new List<ArmExpressionAst>(),
-                    closeParen: new CloseParenToken()
-                )
+            var ex = Assert.Throws<UnexpectedEndOfStreamException>(
+                () => {
+                    var actual = ArmExpressionParser.Parse(expression);
+                }
             );
-            ParserHelper.AssertAreEqual(expected, actual);
-            Assert.AreEqual(expression, actual.ToArmText());
+            var expectedMessage = "Exception of type 'Kingsland.ParseFx.Parsing.UnexpectedEndOfStreamException' was thrown.";
+            Assert.AreEqual(expectedMessage, ex.Message);
         }
 
         #endregion

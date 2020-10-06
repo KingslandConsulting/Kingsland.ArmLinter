@@ -24,23 +24,6 @@ namespace Kingsland.ArmLinter.Tokens
             private set;
         }
 
-        public static bool AreEqual(IdentifierToken obj1, IdentifierToken obj2)
-        {
-            if ((obj1 == null) && (obj2 == null))
-            {
-                return true;
-            }
-            else if ((obj1 == null) || (obj2 == null))
-            {
-                return false;
-            }
-            else
-            {
-                return obj1.Extent.IsEqualTo(obj2.Extent) &&
-                       (obj1.Name == obj2.Name);
-            }
-        }
-
     }
 
 }
