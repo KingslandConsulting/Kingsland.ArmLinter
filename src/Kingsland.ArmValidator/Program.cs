@@ -106,7 +106,7 @@ namespace Kingsland.ArmValidator
                         yield return (JValue)top;
                         break;
                     default:
-                        throw new InvalidOperationException($"unhandled type '{top.Type.ToString()}'");
+                        throw new InvalidOperationException($"unhandled type '{top.Type}'");
                 };
             }
         }
