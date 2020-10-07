@@ -65,16 +65,16 @@ namespace Kingsland.ArmLinter.Functions
         /// <param name="argsOut"></param>
         /// <returns>
         /// Given a MethodInfo and a list of arguments, this function checks if the arguments satisfy the
-        /// type signature of the method and returns true if they can, otherwise returns false.
+        /// type signature of the method and returns true if they do, otherwise returns false.
         ///
         /// If the arguments can be modified to match the type signature of the method then the argsOut
-        /// parameter will contain the modified arguments. If the arguments do not need adapting then
-        /// argsOut will contain a copy of the original argsIn.
+        /// parameter will contain the modified arguments. If the arguments do not need to be modified
+        /// then argsOut will contain a copy of the original argsIn.
         ///
-        /// Modifications that are applied are, if appropriate are:
+        /// Modifications that are applied if appropriate are:
         ///
-        /// + Adding the default values for parameters where an argument is missing
-        /// + Casting some types where a cast makes sense
+        /// + Adding a parameter's default value (if it has one) where an argument is missing
+        /// + Casting the value of argument to match the type of a parameter where a cast makes sense
         /// + Converting multiple "params" argument values into a single array-valued argument
         ///
         /// </returns>

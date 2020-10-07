@@ -11,7 +11,7 @@ namespace Kingsland.ArmLinter.Functions
     public static class ArmArrayFunctions
     {
 
-        #region Concat Methods
+        #region Concat
 
         /// <summary>
         /// Combines multiple arrays and returns the concatenated array.

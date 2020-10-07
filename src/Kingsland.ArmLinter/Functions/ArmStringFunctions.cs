@@ -11,7 +11,7 @@ namespace Kingsland.ArmLinter.Functions
     public static class ArmStringFunctions
     {
 
-        #region Base64 Methods
+        #region Base64
 
         /// <summary>
         /// Returns the base64 representation of the input string.
@@ -40,7 +40,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region Base64ToString Methods
+        #region Base64ToString
 
         /// <summary>
         /// Converts a base64 representation to a string.
@@ -71,7 +71,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region Concat Methods
+        #region Concat
 
         /// <summary>
         /// Combines multiple string values and returns the concatenated string.
@@ -100,7 +100,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region EndsWith Methods
+        #region EndsWith
 
         /// <summary>
         /// Determines whether a string ends with a value. The comparison is case-insensitive.
@@ -135,7 +135,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region PadLeft Methods
+        #region PadLeft
 
         /// <summary>
         /// Returns a right-aligned string by adding characters to the left until reaching the total specified length.
@@ -166,7 +166,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region StartsWith Methods
+        #region StartsWith
 
         /// <summary>
         /// Determines whether a string starts with a value. The comparison is case-insensitive.
@@ -201,7 +201,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region ToLower Methods
+        #region ToLower
 
         /// <summary>
         /// Converts the specified string to lower case.
@@ -225,7 +225,7 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
-        #region ToUpper Methods
+        #region ToUpper
 
         /// <summary>
         /// Converts the specified string to upper case.
