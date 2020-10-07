@@ -100,6 +100,41 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
+        #region EndsWith Methods
+
+        /// <summary>
+        /// Determines whether a string ends with a value. The comparison is case-insensitive.
+        /// </summary>
+        /// <returns>True if the last character or characters of the string match the value; otherwise, False.</returns>
+        /// <param name="stringToSearch">The value that contains the item to find.</param>
+        /// <param name="stringToFind">The value to find.</param>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#startswith
+        /// </remarks>
+        /// <example>
+        /// StartsWith("abcdef", "ef") => true
+        /// </example>
+        /// <example>
+        /// StartsWith("abcdef", "F") => true
+        /// </example>
+        /// <example>
+        /// StartsWith("abcdef", "e") => false
+        /// </example>
+        public static bool EndsWith(string stringToSearch, string stringToFind)
+        {
+            if (stringToSearch == null)
+            {
+                throw new ArgumentNullException(nameof(stringToSearch));
+            }
+            if (stringToFind == null)
+            {
+                throw new ArgumentNullException(nameof(stringToFind));
+            }
+            return stringToSearch.EndsWith(stringToFind, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        #endregion
+
         #region PadLeft Methods
 
         /// <summary>
@@ -127,6 +162,41 @@ namespace Kingsland.ArmLinter.Functions
                 throw new ArgumentOutOfRangeException(nameof(totalLength));
             }
             return valueToPad.PadLeft(totalLength, paddingCharacter);
+        }
+
+        #endregion
+
+        #region StartsWith Methods
+
+        /// <summary>
+        /// Determines whether a string starts with a value. The comparison is case-insensitive.
+        /// </summary>
+        /// <returns>True if the first character or characters of the string match the value; otherwise, False.</returns>
+        /// <param name="stringToSearch">The value that contains the item to find.</param>
+        /// <param name="stringToFind">The value to find.</param>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#startswith
+        /// </remarks>
+        /// <example>
+        /// StartsWith("abcdef", "ab") => true
+        /// </example>
+        /// <example>
+        /// StartsWith("abcdef", "A") => true
+        /// </example>
+        /// <example>
+        /// StartsWith("abcdef", "e") => false
+        /// </example>
+        public static bool StartsWith(string stringToSearch, string stringToFind)
+        {
+            if (stringToSearch == null)
+            {
+                throw new ArgumentNullException(nameof(stringToSearch));
+            }
+            if (stringToFind == null)
+            {
+                throw new ArgumentNullException(nameof(stringToFind));
+            }
+            return stringToSearch.StartsWith(stringToFind, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion

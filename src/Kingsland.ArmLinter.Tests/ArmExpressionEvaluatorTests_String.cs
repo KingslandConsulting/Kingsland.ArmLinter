@@ -105,7 +105,39 @@ namespace Kingsland.ArmLinter.Tests
 
             }
 
-            public static class PadLeft
+            public static class EndsWithTests
+            {
+
+                [Test]
+                public static void MatchingCaseShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "endsWith('abcdef', 'ef')",
+                        true
+                    );
+                }
+
+                [Test]
+                public static void CaseSensitiveMatchShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "endsWith('abcdef', 'F')",
+                        true
+                    );
+                }
+
+                [Test]
+                public static void NoMatchShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "endsWith('abcdef', 'e')",
+                        false
+                    );
+                }
+
+            }
+
+            public static class PadLeftTests
             {
 
                 [Test]
@@ -132,6 +164,38 @@ namespace Kingsland.ArmLinter.Tests
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "padLeft('123', 10)",
                         "       123"
+                    );
+                }
+
+            }
+
+            public static class StartsWithTests
+            {
+
+                [Test]
+                public static void MatchingCaseShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "startsWith('abcdef', 'ab')",
+                        true
+                    );
+                }
+
+                [Test]
+                public static void CaseSensitiveMatchShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "startsWith('abcdef', 'A')",
+                        true
+                    );
+                }
+
+                [Test]
+                public static void NoMatchShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "startsWith('abcdef', 'e')",
+                        false
                     );
                 }
 
