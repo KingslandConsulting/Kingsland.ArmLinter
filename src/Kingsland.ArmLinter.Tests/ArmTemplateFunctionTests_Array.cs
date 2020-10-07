@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Kingsland.ArmLinter.Functions;
+using NUnit.Framework;
 using System;
 
 namespace Kingsland.ArmLinter.Tests
@@ -14,12 +15,27 @@ namespace Kingsland.ArmLinter.Tests
             {
 
                 [Test]
+                public static void NoParametersShouldThrow()
+                {
+                    var ex = Assert.Throws<ArgumentException>(
+                        () =>
+                        {
+                            var actual = ArmArrayFunctions.Concat();
+                        }
+                    );
+                    var expectedMessage = "Concat requires at least one parameter.";
+                    Assert.AreEqual(expectedMessage, ex.Message);
+                }
+
+                [Test]
                 public static void NullArrayShouldThrow()
                 {
                     var ex = Assert.Throws<ArgumentNullException>(
                         () =>
                         {
-                            var actual = ArmTemplateFunctions.Array.Concat((object[][])null);
+                            var actual = ArmArrayFunctions.Concat(
+                                null
+                            );
                         }
                     );
                     var expectedMessage = "Value cannot be null. (Parameter 'args')";
@@ -32,7 +48,9 @@ namespace Kingsland.ArmLinter.Tests
                     var ex = Assert.Throws<ArgumentException>(
                         () =>
                         {
-                            var actual = ArmTemplateFunctions.Array.Concat(new object[][] { });
+                            var actual = ArmArrayFunctions.Concat(
+                                Array.Empty<object[]>())
+                            ;
                         }
                     );
                     var expectedMessage = "Concat requires at least one parameter.";
@@ -42,7 +60,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void OneSingleItemSubArrayShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "hello" }
                     );
                     var expected = new object[] { "hello" };
@@ -52,7 +70,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void TwoSingleItemSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "hello" },
                         new object[] { "brave" }
                     );
@@ -63,7 +81,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManySingleItemSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "hello" },
                         new object[] { "brave" },
                         new object[] { "new" },
@@ -76,7 +94,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void OneMultiItemSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "1-1", "1-2", "1-3" }
                     );
                     var expected = new object[] {
@@ -88,7 +106,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void TwoMultiItemSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "1-1", "1-2", "1-3" },
                         new object[] { "2-1", "2-2", "2-3" }
                     );
@@ -102,7 +120,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyMultiItemStringSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "1-1", "1-2", "1-3" },
                         new object[] { "2-1", "2-2", "2-3" },
                         new object[] { "3-1", "3-2", "3-3" },
@@ -120,7 +138,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyMultiItemIntSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { 11, 12, 13 },
                         new object[] { 21, 22, 23 },
                         new object[] { 31, 32, 33 },
@@ -138,7 +156,7 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyMultiItemMixedSubArraysShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.Array.Concat(
+                    var actual = ArmArrayFunctions.Concat(
                         new object[] { "1-1", 12, "1-3" },
                         new object[] { 21, "2-2", 23 },
                         new object[] { "3-1", 32, "3-3" },

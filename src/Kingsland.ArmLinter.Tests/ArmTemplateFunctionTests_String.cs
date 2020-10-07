@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Kingsland.ArmLinter.Functions;
+using NUnit.Framework;
 using System;
 
 namespace Kingsland.ArmLinter.Tests
@@ -14,12 +15,27 @@ namespace Kingsland.ArmLinter.Tests
             {
 
                 [Test]
+                public static void NoParametersShouldThrow()
+                {
+                    var ex = Assert.Throws<ArgumentException>(
+                        () =>
+                        {
+                            var actual = ArmStringFunctions.Concat();
+                        }
+                    );
+                    var expectedMessage = "Concat requires at least one parameter.";
+                    Assert.AreEqual(expectedMessage, ex.Message);
+                }
+
+                [Test]
                 public static void NullStringsShouldThrow()
                 {
                     var ex = Assert.Throws<ArgumentNullException>(
                         () =>
                         {
-                            var actual = ArmTemplateFunctions.String.Concat((string[])null);
+                            var actual = ArmStringFunctions.Concat(
+                                null
+                            );
                         }
                     );
                     var expectedMessage = "Value cannot be null. (Parameter 'args')";
@@ -32,7 +48,9 @@ namespace Kingsland.ArmLinter.Tests
                     var ex = Assert.Throws<ArgumentException>(
                         () =>
                         {
-                            var actual = ArmTemplateFunctions.String.Concat(new string[] { });
+                            var actual = ArmStringFunctions.Concat(
+                                Array.Empty<string>()
+                            );
                         }
                     );
                     var expectedMessage = "Concat requires at least one parameter.";
@@ -42,7 +60,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void OneStringShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.String.Concat("hello");
+                    var actual = ArmStringFunctions.Concat(
+                        "hello"
+                    );
                     var expected = "hello";
                     Assert.AreEqual(expected, actual);
                 }
@@ -50,7 +70,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void TwoStringsShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.String.Concat("hello", "brave");
+                    var actual = ArmStringFunctions.Concat(
+                        "hello", "brave"
+                    );
                     var expected = "hellobrave";
                     Assert.AreEqual(expected, actual);
                 }
@@ -58,7 +80,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyStringsShouldWork()
                 {
-                    var actual = ArmTemplateFunctions.String.Concat("hello", "brave", "new", "world");
+                    var actual = ArmStringFunctions.Concat(
+                        "hello", "brave", "new", "world"
+                    );
                     var expected = "hellobravenewworld";
                     Assert.AreEqual(expected, actual);
                 }

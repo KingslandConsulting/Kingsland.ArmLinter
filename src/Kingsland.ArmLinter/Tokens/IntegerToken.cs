@@ -7,18 +7,18 @@ namespace Kingsland.ArmLinter.Tokens
     public sealed class IntegerToken : SyntaxToken
     {
 
-        public IntegerToken(long value)
+        public IntegerToken(int value)
             : this(SourceExtent.Empty, value)
         {
         }
 
-        public IntegerToken(SourceExtent extent, long value)
+        public IntegerToken(SourceExtent extent, int value)
             : base(extent)
         {
             this.Value = value;
         }
 
-        public long Value
+        public int Value
         {
             get;
             private set;

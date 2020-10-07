@@ -8,16 +8,8 @@ namespace Kingsland.ArmLinter.Functions
     /// Implementation of built-in ARM Template Array functions.
     /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-array
     /// </summary>
-    public sealed class ArrayFunctions
+    public static class ArmArrayFunctions
     {
-
-        #region Constructors
-
-        internal ArrayFunctions()
-        {
-        }
-
-        #endregion
 
         #region Concat Methods
 
@@ -37,7 +29,7 @@ namespace Kingsland.ArmLinter.Functions
         /// ) =>
         ///     new object[] { "1-1", "1-2", "1-3", "2-1", "2-2", "2-3" }
         /// </example>
-        public object[] Concat(params object[][] args)
+        public static object[] Concat(params object[][] args)
         {
             return args switch
             {

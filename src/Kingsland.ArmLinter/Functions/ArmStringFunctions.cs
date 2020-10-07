@@ -8,16 +8,8 @@ namespace Kingsland.ArmLinter.Functions
     /// Implementation of built-in ARM Template String functions.
     /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string
     /// </summary>
-    public sealed class StringFunctions
+    public static class ArmStringFunctions
     {
-
-        #region Constructors
-
-        internal StringFunctions()
-        {
-        }
-
-        #endregion
 
         #region Base64 Methods
 
@@ -35,7 +27,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// Base64("{'one': 'a', 'two': 'b'}") => ???
         /// </example>
-        public string Base64(string inputString)
+        public static string Base64(string inputString)
         {
             if (inputString == null)
             {
@@ -64,7 +56,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// Base64ToString(???) => "{'one': 'a', 'two': 'b'}"
         /// </example>
-        public string Base64ToString(string base64Value)
+        public static string Base64ToString(string base64Value)
         {
             if (base64Value == null)
             {
@@ -93,7 +85,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// Concat("prefix", "-", "suffix") => "prefix-suffix"
         /// </example>
-        public string Concat(params string[] args)
+        public static string Concat(params string[] args)
         {
             if (args == null)
             {
@@ -124,7 +116,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// PadLeft("123", 10, '0') => "0000000123"
         /// </example>
-        public string PadLeft(string valueToPad, long totalLength, char paddingCharacter = ' ')
+        public static string PadLeft(string valueToPad, int totalLength, char paddingCharacter = ' ')
         {
             if (valueToPad == null)
             {
@@ -152,7 +144,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// ToLower("One Two Three") => "one two three"
         /// </example>
-        public string ToLower(string stringToChange)
+        public static string ToLower(string stringToChange)
         {
             if (stringToChange == null)
             {
@@ -176,7 +168,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// ToUpper("One Two Three") => "ONE TWO THREE"
         /// </example>
-        public string ToUpper(string stringToChange)
+        public static string ToUpper(string stringToChange)
         {
             if (stringToChange == null)
             {
