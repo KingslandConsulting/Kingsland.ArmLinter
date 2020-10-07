@@ -66,8 +66,14 @@ namespace Kingsland.ArmLinter
                     typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
                     typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
                 },
+                "endsWith" => new List<MethodInfo> {
+                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith))
+                },
                 "padLeft" => new List<MethodInfo> {
                     typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft))
+                },
+                "startsWith" => new List<MethodInfo> {
+                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith))
                 },
                 "toLower" => new List<MethodInfo> {
                     typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower))
