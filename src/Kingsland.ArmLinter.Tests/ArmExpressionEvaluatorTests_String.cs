@@ -105,6 +105,38 @@ namespace Kingsland.ArmLinter.Tests
 
             }
 
+            public static class PadLeft
+            {
+
+                [Test]
+                public static void SampleStringShouldPadLeft()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "padLeft('123', 10, '0')",
+                        "0000000123"
+                    );
+                }
+
+                [Test]
+                public static void ShortStringShouldNotAppendPadding()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "padLeft('123', 2, '0')",
+                        "123"
+                    );
+                }
+
+                [Test]
+                public static void DefaultPaddingCharacterShouldBeSpace()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "padLeft('123', 10)",
+                        "       123"
+                    );
+                }
+
+            }
+
             public static class ToLowerTests
             {
 

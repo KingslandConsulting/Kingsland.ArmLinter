@@ -37,15 +37,13 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public string Base64(string inputString)
         {
-            return inputString switch
+            if (inputString == null)
             {
-                null =>
-                    throw new ArgumentNullException(nameof(inputString)),
-                _ =>
-                    Convert.ToBase64String(
-                        Encoding.UTF8.GetBytes(inputString)
-                    )
-            };
+                throw new ArgumentNullException(nameof(inputString));
+            }
+            return Convert.ToBase64String(
+                Encoding.UTF8.GetBytes(inputString)
+            );
         }
 
         #endregion
@@ -68,17 +66,15 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public string Base64ToString(string base64Value)
         {
-            return base64Value switch
+            if (base64Value == null)
             {
-                null =>
-                    throw new ArgumentNullException(nameof(base64Value)),
-                _ =>
-                    Encoding.UTF8.GetString(
-                        Convert.FromBase64String(
-                            base64Value
-                        )
-                    )
-            };
+                throw new ArgumentNullException(nameof(base64Value));
+            }
+            return Encoding.UTF8.GetString(
+                Convert.FromBase64String(
+                    base64Value
+                )
+            );
         }
 
         #endregion
@@ -99,15 +95,46 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public string Concat(params string[] args)
         {
-            return args switch
+            if (args == null)
             {
-                null =>
-                    throw new ArgumentNullException(nameof(args)),
-                string[] { Length: 0 } =>
-                    throw new ArgumentException($"{nameof(Concat)} requires at least one parameter."),
-                _ =>
-                     string.Join(string.Empty, args)
-            };
+                throw new ArgumentNullException(nameof(args));
+            }
+            if (args.Length == 0)
+            {
+                throw new ArgumentException($"{nameof(Concat)} requires at least one parameter.");
+            }
+            return string.Join(string.Empty, args);
+        }
+
+        #endregion
+
+        #region PadLeft Methods
+
+        /// <summary>
+        /// Returns a right-aligned string by adding characters to the left until reaching the total specified length.
+        /// </summary>
+        /// <returns>A string with at least the number of specified characters.</returns>
+        /// <param name="valueToPad">The value to right-align.</param>
+        /// <param name="totalLength">The total number of characters in the returned string.</param>
+        /// <param name="paddingCharacter">The character to use for left-padding until the total length is reached. The default value is a space.</returns>
+        /// <remarks>
+        /// If the original string is longer than the number of characters to pad, no characters are added.
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#padleft
+        /// </remarks>
+        /// <example>
+        /// PadLeft("123", 10, '0') => "0000000123"
+        /// </example>
+        public string PadLeft(string valueToPad, long totalLength, char paddingCharacter = ' ')
+        {
+            if (valueToPad == null)
+            {
+                throw new ArgumentNullException(nameof(valueToPad));
+            }
+            if (totalLength < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalLength));
+            }
+            return valueToPad.PadLeft(totalLength, paddingCharacter);
         }
 
         #endregion
@@ -127,13 +154,11 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public string ToLower(string stringToChange)
         {
-            return stringToChange switch
+            if (stringToChange == null)
             {
-                null =>
-                    throw new ArgumentNullException(nameof(stringToChange)),
-                _ =>
-                    stringToChange.ToLowerInvariant()
-            };
+                throw new ArgumentNullException(nameof(stringToChange));
+            }
+            return stringToChange.ToLowerInvariant();
         }
 
         #endregion
@@ -153,13 +178,11 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public string ToUpper(string stringToChange)
         {
-            return stringToChange switch
+            if (stringToChange == null)
             {
-                null =>
-                    throw new ArgumentNullException(nameof(stringToChange)),
-                _ =>
-                    stringToChange.ToUpperInvariant()
-            };
+                throw new ArgumentNullException(nameof(stringToChange));
+            }
+            return stringToChange.ToUpperInvariant();
         }
 
         #endregion

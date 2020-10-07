@@ -11,12 +11,12 @@ namespace Kingsland.ArmLinter.Ast
         /// <summary>
         /// </summary>
         /// <param name="token"></param>
-        public ArmNumericLiteralExpressionAst(SyntaxToken token)
+        public ArmNumericLiteralExpressionAst(IntegerToken token)
         {
             this.Token = token ?? throw new ArgumentNullException(nameof(token));
         }
 
-        public SyntaxToken Token
+        public IntegerToken Token
         {
             get;
             private set;
