@@ -105,6 +105,94 @@ namespace Kingsland.ArmLinter.Tests
 
             }
 
+            public static class DataUriTests
+            {
+
+                [Test]
+                public static void ShouldConvertToDataUr_1()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUri('Hello')",
+                        "data:text/plain;charset=utf8;base64,SGVsbG8="
+                    );
+                }
+
+
+                [Test]
+                public static void ShouldConvertToDataUri_2()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUri('GIF87a')",
+                        "data:text/plain;charset=utf8;base64,R0lGODdh"
+                    );
+                }
+
+                [Test]
+                public static void ShouldConvertToDataUri_3()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUri('the data:1234,5678')",
+                        "data:text/plain;charset=utf8;base64,dGhlIGRhdGE6MTIzNCw1Njc4"
+                    );
+                }
+
+            }
+
+            public static class DataUriToStringTests
+            {
+
+                [Test]
+                public static void ShouldConvertFromDataUri_1()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUriToString('data:;base64,SGVsbG8sIFdvcmxkIQ==')",
+                        "Hello, World!"
+                    );
+                }
+
+                [Test]
+                public static void ShouldConvertFromDataUri_2()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUriToString('data:text/vnd-example+xyz;foo=bar;base64,R0lGODdh')",
+                        "GIF87a"
+                    );
+                }
+
+                [Test]
+                public static void ShouldConvertFromDataUri_3()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUriToString('data:text/plain;charset=UTF-8;page=21,the%20data:1234,5678')",
+                        "the data:1234,5678"
+                    );
+                }
+
+            }
+
+            public static class EmptyTests
+            {
+
+                [Test]
+                public static void EmptyStringShouldReturnTrue()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "empty('')",
+                        true
+                    );
+                }
+
+                [Test]
+                public static void NonEmptyStringShouldReturnFalse()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "empty('abc')",
+                        false
+                    );
+                }
+
+            }
+
             public static class EndsWithTests
             {
 

@@ -27,6 +27,12 @@ namespace Kingsland.ArmLinter.Functions
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
                 typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
             }},
+            { "dataUri", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUri))
+            }},
+            { "dataUriToString", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUriToString))
+            }},
             { "empty", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Empty))
             }},

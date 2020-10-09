@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Kingsland.ArmLinter.Functions
@@ -100,6 +101,70 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
+        #region DataUri
+
+        /// <summary>
+        /// Converts a value to a data URI.
+        /// </summary>
+        /// <param name="stringToConvert">The value to convert to a data URI.</param>
+        /// <returns>A string formatted as a data URI.</returns>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#datauri
+        /// </remarks>
+        /// <example>
+        /// DataUri("Hello") => "data:text/plain;charset=utf8;base64,SGVsbG8="
+        /// </example>
+        public static string DataUri(string stringToConvert)
+        {
+            if (stringToConvert == null)
+            {
+                throw new ArgumentNullException(nameof(stringToConvert));
+            }
+            // see https://en.wikipedia.org/wiki/Data_URI_scheme
+            var dataUri = new DataUri(
+                "text/plain",
+                new Dictionary<string, string> { { "charset", "utf8" } },
+                Encoding.UTF8.GetBytes(stringToConvert)
+            );
+            return dataUri.ToString(true);
+        }
+
+        #endregion
+
+        #region DataUriToString
+
+        /// <summary>
+        /// Converts a data URI formatted value to a string.
+        /// </summary>
+        /// <param name="dataUriToConvert">The data URI value to convert.</param>
+        /// <returns>A string containing the converted value.</returns>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#datauritostring
+        /// </remarks>
+        /// <example>
+        /// DateUriToString("data:;base64,SGVsbG8sIFdvcmxkIQ==") => "Hello, World!"
+        /// </example>
+        public static string DataUriToString(string stringToConvert)
+        {
+            if (stringToConvert == null)
+            {
+                throw new ArgumentNullException(nameof(stringToConvert));
+            }
+            var dataUri = Functions.DataUri.Parse(stringToConvert);
+            var encoding = Encoding.ASCII;
+            if (dataUri.Parameters.TryGetValue("charset", out var encodingName))
+            {
+                encoding = encodingName switch
+                {
+                    "utf8" => Encoding.UTF8,
+                    "UTF-8" => Encoding.UTF8,
+                    _ => throw new InvalidOperationException()
+                };
+            }
+            return encoding.GetString(dataUri.Data);
+        }
+
+        #endregion
 
         #region Empty
 
