@@ -12,6 +12,41 @@ namespace Kingsland.ArmLinter.Functions
     internal static class BindingHelper
     {
 
+        // example error message from the Azure Resource Manager:
+        //
+        // not enough arguments - e.g. "[base64()]"
+        // too many arguments - e.g. "[base64('one', 'two')]"
+        // wrong type *and* wrong number - e.g. "[base64(100, 100)]"
+        //   New-AzResourceGroupDeployment: 21:32:16 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'no_parameters' is not valid: The template language function 'base64' must have only one parameter. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: e07fb1b6-ff5e-4eab-b194-1e9812cad025
+        //
+        // base64ToString gives a slightly different error with more detail - e.g. "base64ToString()":
+        //   New-AzResourceGroupDeployment: 21:56:01 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: Unable to evaluate template language function 'base64ToString': function requires 1 argument(s) while 2 were provided.Please see https://aka.ms/arm-template-expressions/#base64ToString for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: 8ccf15a8-434e-4fb8-931e-0c25ffb08988
+        //
+        // concat (with variable number of args) gives a different error again - e.g. "concat()":
+        //   New-AzResourceGroupDeployment: 22:02:45 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: Unable to evaluate template language function 'concat'. At least one parameter should be provided.Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: 583fc4b5-e29f-4914-a143-fa523df00786
+        //
+        // correct number of arguments but wrong type - e.g. "[base64(100)]"
+        //   New-AzResourceGroupDeployment: 21:47:06 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Integer'. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: 473dd259-9f48-4dab-b438-db789cd566ee
+        //
+        // correct number of arguments but wrong type - e.g. "[base64(createArray(100, 100))]"
+        //   New-AzResourceGroupDeployment: 21:49:50 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Array'. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: 604e8dd3-0ad0-4edc-b202-18d1ba7c8f14
+        //
+        // non-existent function - e.g. "[nonexistent()]"
+        //   New-AzResourceGroupDeployment: 21:50:43 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
+        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template function 'nonexistent' is not valid.Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
+        //   CorrelationId: 215d46ea-150e-410f-9996-5ce302b0ef81
+
+
         private static readonly Dictionary<string, MethodInfo[]> _functionBindings = new Dictionary<string, MethodInfo[]>
         {
             { "base64", new [] {
@@ -100,15 +135,7 @@ namespace Kingsland.ArmLinter.Functions
             {
                 throw new NotImplementedException($"The ARM Template function '{name}' is not implemented.");
             }
-            var matches = _functionBindings[name]
-                .Select(
-                    m => (
-                        MethodInfo: m,
-                        Args: BindingHelper.TryBindParameters(m, args, out var argsOut) ?
-                            argsOut : null
-                    )
-                ).Where(x => x.Args != null)
-                .ToList();
+            var matches = BindingHelper.BindMethodInfos(_functionBindings[name], args).ToList();
             if (matches.Count == 0)
             {
                 var message = "No method overloads match the arguments.\r\n" +
@@ -129,6 +156,18 @@ namespace Kingsland.ArmLinter.Functions
                 throw new InvalidOperationException(message);
             }
             return matches[0].MethodInfo.Invoke(null, matches[0].Args);
+        }
+
+        internal static IEnumerable<(MethodInfo MethodInfo, object[] Args)> BindMethodInfos(IEnumerable<MethodInfo> methodInfos, object[] args)
+        {
+            return methodInfos
+                .Select(
+                    m => (
+                        MethodInfo: m,
+                        Args: BindingHelper.TryBindParameters(m, args, out var argsOut) ?
+                            argsOut : null
+                    )
+                ).Where(x => x.Args != null);
         }
 
         /// <summary>
@@ -155,7 +194,7 @@ namespace Kingsland.ArmLinter.Functions
         /// + Converting array arguments where the element type needs to be different
         ///
         /// </returns>
-        private static bool TryBindParameters(MethodInfo methodInfo, object[] argsIn, out object[] argsOut)
+        internal static bool TryBindParameters(MethodInfo methodInfo, object[] argsIn, out object[] argsOut)
         {
 
             if (methodInfo == null)
@@ -255,7 +294,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <param name="desiredType"></param>
         /// <param name="convertedValue"></param>
         /// <returns></returns>
-        private static bool TryConvertValue(object originalValue, Type desiredType, out object convertedValue)
+        internal static bool TryConvertValue(object originalValue, Type desiredType, out object convertedValue)
         {
             if (originalValue == null)
             {
@@ -316,7 +355,7 @@ namespace Kingsland.ArmLinter.Functions
         /// <remarks>
         /// See https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#:~:text=Covariance%20and%20contravariance%20are%20terms,assigning%20and%20using%20generic%20types.
         /// </remarks>
-        private static bool TryConvertArray(Array originalArray, Type elementType, out object convertedArray)
+        internal static bool TryConvertArray(Array originalArray, Type elementType, out object convertedArray)
         {
             var tmpArray = Array.CreateInstance(elementType, originalArray.Length);
             for (var index = 0; index < originalArray.Length; index++)

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 
 namespace Kingsland.ArmLinter.Tests
 {
@@ -11,6 +12,45 @@ namespace Kingsland.ArmLinter.Tests
 
             public static class Base64Tests
             {
+
+                [Test]
+                public static void InvokingWithNoArgumentsShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64()",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n"
+                    );
+                }
+
+                [Test]
+                public static void InvokingWithTooManyArgumentsShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64('one', 'two')",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n" +
+                        "System.String\r\n" +
+                        "System.String"
+                    );
+                }
+
+                [Test]
+                public static void InvokingWithWrongTypeShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64(100)",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n" +
+                        "System.Int32"
+                    );
+                }
 
                 [Test]
                 public static void SampleStringShouldEncodeToBase64()
@@ -36,6 +76,45 @@ namespace Kingsland.ArmLinter.Tests
             {
 
                 [Test]
+                public static void InvokingWithNoArgumentsShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64ToString()",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n"
+                    );
+                }
+
+                [Test]
+                public static void InvokingWithTooManyArgumentsShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64ToString('one', 'two')",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n" +
+                        "System.String\r\n" +
+                        "System.String"
+                    );
+                }
+
+                [Test]
+                public static void InvokingWithWrongTypeShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "base64ToString(100)",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n" +
+                        "System.Int32"
+                    );
+                }
+
+                [Test]
                 public static void SampleBase64StringShouldDecodeToOriginalString()
                 {
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
@@ -58,6 +137,41 @@ namespace Kingsland.ArmLinter.Tests
             public static class ConcatTests
             {
 
+
+                [Test]
+                public static void InvokingWithNoArgumentsShouldThrow()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "concat()",
+                        typeof(InvalidOperationException),
+                        "More than one method overload matches the arguments.\r\n" +
+                        "\r\n" +
+                        "Overloads are:\r\n" +
+                        "System.String Concat(System.String[])\r\n" +
+                        "System.Object[] Concat(System.Object[][])\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n"
+                    );
+                }
+
+                [Test]
+                public static void OneEmptyStringShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "concat('')",
+                        ""
+                    );
+                }
+
+                [Test]
+                public static void MultipleEmptyStringsShouldWork()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "concat('', '', '')",
+                        ""
+                    );
+                }
+
                 [Test]
                 public static void OneStringShouldWork()
                 {
@@ -77,10 +191,19 @@ namespace Kingsland.ArmLinter.Tests
                 }
 
                 [Test]
-                public static void ManyStringsShouldWork()
+                public static void ManyStringsShouldWork_1()
                 {
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello', 'brave', 'new', 'world')",
+                        "hellobravenewworld"
+                    );
+                }
+
+                [Test]
+                public static void ManyStringsShouldWork_2()
+                {
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "concat('hello', '', 'brave', '', 'new', '', 'world')",
                         "hellobravenewworld"
                     );
                 }

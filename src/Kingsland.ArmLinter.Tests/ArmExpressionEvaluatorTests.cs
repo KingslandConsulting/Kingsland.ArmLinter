@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 
 namespace Kingsland.ArmLinter.Tests
 {
@@ -10,6 +11,19 @@ namespace Kingsland.ArmLinter.Tests
         {
             var actual = ArmExpressionEvaluator.Evaluate(expression);
             Assert.AreEqual(expected, actual);
+        }
+
+        private static void AssertEvaluatorTestThrows(string expression, Type expectedType, string expectedMessage)
+        {
+
+            var ex = Assert.Throws(
+                expectedType,
+                () =>
+                {
+                    var actual = ArmExpressionEvaluator.Evaluate(expression);
+                }
+            );
+            Assert.AreEqual(expectedMessage, ex.Message);
         }
 
     }
