@@ -33,7 +33,7 @@ At present, it won't validate the argument signature of functions - e.g.
 Evaluating
 ----------
 
-The library supports evaluating a very limited subset of ARM Template functions inside expression strings - for example:
+The library supports evaluating a limited subset of ARM Template functions inside expression strings - for example:
 
 ```csharp
 ArmExpressionEvaluator.Evaluate("concat('hello', 'brave', 'new', 'world')");
@@ -52,13 +52,11 @@ ArmExpressionEvaluator.Evaluate("concat(toLower('ONE'), '-', toUpper('two'), '-'
 // returns "one-TWO-dGhyZWU="
 
 ```
-Note - there's only a few functions that currently work:
+The following functions are currently implemented:
 
-* ```concat```
-* ```base64```
-* ```base64ToString```
-* ```toLower```
-* ```toUpper```
+* [Array functions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-array): ```concat```, ```createArray```
+
+* [String functions](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string): ```base64```, ```base64ToString```, ```concat```, ```dataUri```, ```dataUriToString```, ```empty```, ```endsWith```, ```first```, ```format```, ```indexOf```, ```last```, ```lastIndexOf```, ```length```, ```padLeft```, ```replace```, ```skip```, ```startsWith```, ```substring```, ```take```, ```toLower```, ```toUpper```, ```trim```
 
 but the code is structured to allow easy addition of new functions, so post an issue (or send a PR) if there's one you'd like to be supported.
 
