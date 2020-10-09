@@ -12,17 +12,47 @@ namespace Kingsland.ArmLinter.Functions
     internal static class BindingHelper
     {
 
+        private static readonly Dictionary<string, MethodInfo[]> _functionBindings = new Dictionary<string, MethodInfo[]>
+        {
+            { "base64", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64))
+            }},
+            { "base64ToString", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString))
+            }},
+            { "concat", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
+                typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
+            }},
+            { "endsWith", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith))
+            }},
+            { "padLeft", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft))
+            }},
+            { "startsWith", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith))
+            }},
+            { "toLower", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower))
+            }},
+            { "toUpper", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToUpper))
+            }}
+        };
+
         /// <summary>
         /// Finds the best matching method based on the arguments and invokes it.
         /// If no methods match or if multiple methods match, an exception is thrwn.
         /// </summary>
-        public static object Invoke(List<MethodInfo> methodInfos, object[] args)
+        public static object InvokeFunction(string name, object[] args)
         {
-            if (methodInfos == null)
+            if (!_functionBindings.ContainsKey(name))
             {
-                throw new ArgumentNullException(nameof(methodInfos));
+                throw new NotImplementedException($"The ARM Template function '{name}' is not implemented.");
             }
-            var matches = methodInfos.Select(
+            var matches = _functionBindings[name]
+                .Select(
                     m => (
                         MethodInfo: m,
                         Args: BindingHelper.TryBindParameters(m, args, out var argsOut) ?
@@ -34,9 +64,6 @@ namespace Kingsland.ArmLinter.Functions
             {
                 var message = "No method overloads match the arguments.\r\n" +
                     "\r\n" +
-                    "Overloads are:\r\n" +
-                    string.Join("\r\n", methodInfos.Select(m => m.ToString())) + "\r\n" +
-                    "\r\n" +
                     "Arguments are:\r\n" +
                     string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
                 throw new InvalidOperationException(message);
@@ -46,7 +73,7 @@ namespace Kingsland.ArmLinter.Functions
                 var message = "More than one method overload matches the arguments.\r\n" +
                     "\r\n" +
                     "Overloads are:\r\n" +
-                    string.Join("\r\n", methodInfos.Select(m => m.ToString())) + "\r\n" +
+                    string.Join("\r\n", _functionBindings[name].Select(m => m.ToString())) + "\r\n" +
                     "\r\n" +
                     "Arguments are:\r\n" +
                     string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));

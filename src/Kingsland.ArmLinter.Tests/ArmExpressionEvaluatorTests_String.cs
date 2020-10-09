@@ -3,7 +3,7 @@
 namespace Kingsland.ArmLinter.Tests
 {
 
-    public static class ArmExpressionEvaluatorTests
+    public static partial class ArmExpressionEvaluatorTests
     {
 
         public static class StringTests
