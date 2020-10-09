@@ -54,36 +54,7 @@ namespace Kingsland.ArmLinter
         private static object Evaluate(ArmFunctionReferenceAst node, ArmArgumentListAst argList)
         {
             var args = ArmExpressionEvaluator.Evaluate(argList).ToArray();
-            var methodInfos = node.Name.Name switch
-            {
-                "base64" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64))
-                },
-                "base64ToString" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString))
-                },
-                "concat" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
-                    typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
-                },
-                "endsWith" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith))
-                },
-                "padLeft" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft))
-                },
-                "startsWith" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith))
-                },
-                "toLower" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower))
-                },
-                "toUpper" => new List<MethodInfo> {
-                    typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToUpper))
-                },
-                _ => throw new NotImplementedException($"The ARM Template function '{node.Name.Name}' is not implemented."),
-            };
-            return BindingHelper.Invoke(methodInfos, args);
+            return BindingHelper.InvokeFunction(node.Name.Name, args);
         }
 
         private static object Evaluate(ArmInvocationExpressionAst node)
