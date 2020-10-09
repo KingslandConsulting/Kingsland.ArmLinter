@@ -7,7 +7,7 @@ namespace Kingsland.ArmLinter.Functions
 {
 
     /// <summary>
-    /// Provides some reflection-based methods  method
+    /// Provides some reflection-based methods to invoke ARM Template functions.
     /// </summary>
     internal static class BindingHelper
     {
@@ -38,8 +38,8 @@ namespace Kingsland.ArmLinter.Functions
                     string.Join("\r\n", methodInfos.Select(m => m.ToString())) + "\r\n" +
                     "\r\n" +
                     "Arguments are:\r\n" +
-                    string.Join("\r\n", args.Select(a => a.GetType().ToString()));
-                throw new ArgumentException(message, nameof(methodInfos));
+                    string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
+                throw new InvalidOperationException(message);
             }
             if (matches.Count > 1)
             {
@@ -49,8 +49,8 @@ namespace Kingsland.ArmLinter.Functions
                     string.Join("\r\n", methodInfos.Select(m => m.ToString())) + "\r\n" +
                     "\r\n" +
                     "Arguments are:\r\n" +
-                    string.Join("\r\n", args.Select(a => a.GetType().ToString()));
-                throw new ArgumentException(message, nameof(methodInfos));
+                    string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
+                throw new InvalidOperationException(message);
             }
             return matches[0].MethodInfo.Invoke(null, matches[0].Args);
         }
@@ -74,8 +74,9 @@ namespace Kingsland.ArmLinter.Functions
         /// Modifications that are applied if appropriate are:
         ///
         /// + Adding a parameter's default value (if it has one) where an argument is missing
-        /// + Casting the value of argument to match the type of a parameter where a cast makes sense
+        /// + Casting the value of arguments to match the type of a parameter where a cast makes sense
         /// + Converting multiple "params" argument values into a single array-valued argument
+        /// + Converting array arguments where the element type needs to be different
         ///
         /// </returns>
         private static bool TryBindParameters(MethodInfo methodInfo, object[] argsIn, out object[] argsOut)
@@ -87,7 +88,7 @@ namespace Kingsland.ArmLinter.Functions
             }
 
             var parameters = methodInfo.GetParameters();
-            var argsTmp = new List<object>(argsIn);
+            var newArgs = new List<object>(argsIn);
 
             var parameterIndex = 0;
             while (parameterIndex < parameters.Length)
@@ -95,57 +96,57 @@ namespace Kingsland.ArmLinter.Functions
 
                 var parameter = parameters[parameterIndex];
 
-                // if there's no argument for this parameter we can
-                // see if it has a default value and use that
-                if (argsTmp.Count <= parameterIndex)
-                {
-                    if (!parameter.HasDefaultValue)
-                    {
-                        argsOut = null;
-                        return false;
-                    }
-                    argsTmp.Add(parameter.DefaultValue);
-                }
-
-                // cast any parameters that don't quite match the required type
-                if (parameter.ParameterType == typeof(char))
-                {
-                    if ((argsTmp[parameterIndex] is string castArg) && (castArg.Length == 1))
-                    {
-                        // ARM templates don't support a char type - everything is a string.
-                        // so, if a parameter is a char, and the argument is a string consisting
-                        // of a single char then we'llconvert it to a char
-                        argsTmp[parameterIndex] = castArg[0];
-                    }
-                }
-
-                // roll any "params" arguments up into a single array-valued argument
+                // check if this is a "params" parameter with a dynamic number of arguments
                 var paramsAttribute = parameter.GetCustomAttribute(typeof(ParamArrayAttribute));
                 if (paramsAttribute != null)
                 {
+
                     if (parameterIndex != (parameters.Length - 1))
                     {
                         throw new InvalidOperationException("params must be the last parameter.");
                     }
-                    // get the params args and check their types are ok
-                    var elementType = parameter.ParameterType.GetElementType();
-                    var paramsArgs = argsTmp.Skip(parameterIndex).ToArray();
-                    if (!paramsArgs.All(a => a.GetType() == elementType))
+
+                    // convert the params array
+                    if(
+                        !BindingHelper.TryConvertArray(
+                            argsIn.Skip(parameterIndex).ToArray(),
+                            parameter.ParameterType.GetElementType(),
+                            out var convertedArray
+                        )
+                    )
                     {
                         argsOut = null;
                         return false;
                     }
-                    // build the params array
-                    var paramsArray = Array.CreateInstance(elementType, argsIn.Length - parameterIndex);
-                    paramsArgs.CopyTo(paramsArray, 0);
-                    // replace the params args
-                    argsTmp = argsTmp.Take(parameterIndex).ToList();
-                    argsTmp.Add(paramsArray);
-                }
 
-                // check the type of the argument matches the type of the parameter
-                if (argsTmp[parameterIndex].GetType() != parameter.ParameterType)
+                    // replace the multiple "params" args with the params array
+                    newArgs = newArgs.Take(parameterIndex).ToList();
+                    newArgs.Add(convertedArray);
+
+                }
+                else if (newArgs.Count <= parameterIndex)
                 {
+
+                    // if there's no argument for this parameter we can
+                    // see if it has a default value and use that
+                    if (parameter.HasDefaultValue)
+                    {
+                        newArgs.Add(parameter.DefaultValue);
+                    }
+                    else
+                    {
+                        argsOut = null;
+                        return false;
+                    }
+                }
+                else if (BindingHelper.TryConvertValue(newArgs[parameterIndex], parameter.ParameterType, out var convertedArg))
+                {
+                    // try to convert any parameters that don't quite match the required type
+                    newArgs[parameterIndex] = convertedArg;
+                }
+                else
+                {
+                    // we couldn't convert the argument type to match the parameter type
                     argsOut = null;
                     return false;
                 }
@@ -154,10 +155,108 @@ namespace Kingsland.ArmLinter.Functions
 
             }
 
+            // we've processed all the method parameters and arguments, but
+            // do we have the same number of each now? (i.e. were there the
+            // right number of arguments in the attempted call to the mathod?)
+            if (newArgs.Count != parameters.Length)
+            {
+                argsOut = null;
+                return false;
+            }
+
             // everything look ok
-            argsOut = argsTmp.ToArray();
+            argsOut = newArgs.ToArray();
             return true;
 
+        }
+
+        /// <summary>
+        /// Attempts to convert the given value to a different type. Some of this
+        /// conversion is specific to ARM Templates (e.g. string -> char), and
+        /// some of it is a (very) limited version of what the C# compiler does.
+        /// </summary>
+        /// <param name="originalValue"></param>
+        /// <param name="desiredType"></param>
+        /// <param name="convertedValue"></param>
+        /// <returns></returns>
+        private static bool TryConvertValue(object originalValue, Type desiredType, out object convertedValue)
+        {
+            if (originalValue == null)
+            {
+                convertedValue = originalValue;
+                return true;
+            }
+            if (desiredType.IsAssignableFrom(originalValue.GetType()))
+            {
+                // it's already the desired type, so no conversion necessary
+                convertedValue = originalValue;
+                return true;
+            }
+            if (desiredType == typeof(object))
+            {
+                // value types return false for IsAssignablFrom()
+                // but we can still box them into objects
+                convertedValue = originalValue;
+                return true;
+            }
+            // ARM templates don't support a char type - everything is a string,
+            // so if a parameter is a char and the argument is a string consisting
+            // of a single char then we'll convert it to a char
+            if (desiredType == typeof(char))
+            {
+                if ((originalValue is string stringArg) && (stringArg.Length == 1))
+                {
+                    convertedValue = stringArg[0];
+                    return true;
+                }
+            }
+            // can we cast arrays? e.g. object[] -> string[]
+            // see https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/covariance-contravariance/
+            if (originalValue.GetType().IsArray && desiredType.IsArray)
+            {
+                if (BindingHelper.TryConvertArray((Array)originalValue, desiredType.GetElementType(), out var convertedArray))
+                {
+                    convertedValue = convertedArray;
+                    return true;
+                }
+            }
+            convertedValue = null;
+            return false;
+        }
+
+        /// <summary>
+        /// A poor-mans's contravariance / covariance implementation. Given an
+        /// array of one type of element, TryConvertArray attempts to convert
+        /// it into an array of another compatible type.
+        ///
+        /// For example, given a string[] we can convert it into an object[].
+        /// And, given an object[] where all the items are strings, we can
+        /// convert it into a string[].
+        /// </summary>
+        /// <param name="originalArray"></param>
+        /// <param name="elementType"></param>
+        /// <param name="convertedArray"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#:~:text=Covariance%20and%20contravariance%20are%20terms,assigning%20and%20using%20generic%20types.
+        /// </remarks>
+        private static bool TryConvertArray(Array originalArray, Type elementType, out object convertedArray)
+        {
+            var tmpArray = Array.CreateInstance(elementType, originalArray.Length);
+            for (var index = 0; index < originalArray.Length; index++)
+            {
+                if (BindingHelper.TryConvertValue(originalArray.GetValue(index), elementType, out var convertedValue))
+                {
+                    tmpArray.SetValue(convertedValue, index);
+                }
+                else
+                {
+                    convertedArray = null;
+                    return false;
+                }
+            }
+            convertedArray = tmpArray;
+            return true;
         }
 
     }
