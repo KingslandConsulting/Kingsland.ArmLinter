@@ -20,18 +20,61 @@ namespace Kingsland.ArmLinter.Functions
             { "base64ToString", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString))
             }},
+            { "createArray", new [] {
+                typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.CreateArray))
+            }},
             { "concat", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
                 typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
             }},
+            { "empty", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Empty))
+            }},
             { "endsWith", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith))
+            }},
+            { "first", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.First))
+            }},
+            { "format", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Format))
+            }},
+            { "indexOf", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.IndexOf))
+            }},
+            { "last", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Last))
+            }},
+            { "length", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Length))
+            }},
+            { "lastIndexOf", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.LastIndexOf))
             }},
             { "padLeft", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft))
             }},
+            { "replace", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Replace))
+            }},
+            { "split", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split), new Type[] { typeof(string), typeof(string) }),
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split), new Type[] { typeof(string), typeof(string[]) })
+            }},
+            { "skip", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Skip))
+            }},
             { "startsWith", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith))
+            }},
+            { "substring", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Substring))
+            }},
+            { "take", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Take))
+            }},
+            { "trim", new [] {
+                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Trim))
             }},
             { "toLower", new [] {
                 typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower))

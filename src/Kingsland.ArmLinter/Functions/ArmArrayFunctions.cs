@@ -44,6 +44,31 @@ namespace Kingsland.ArmLinter.Functions
 
         #endregion
 
+        #region CreateArray
+
+        /// <summary>
+        /// Creates an array from the parameters.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns>An array.</returns>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-array#createarray
+        /// </remarks>
+        /// <example>
+        /// CreateArray("a", "b", "c") =>
+        ///     new object[] { "a", "b", "c" }
+        /// </example>
+        /// <example>
+        /// CreateArray(1, 2, 3) =>
+        ///     new object[] { 1, 2, 3 }
+        /// </example>
+        public static object[] CreateArray(params object[] args)
+        {
+            return args;
+        }
+
+        #endregion
+
     }
 
 }
