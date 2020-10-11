@@ -16,6 +16,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void InvokingWithNoArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:39:23 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-deployment' is not valid: The template language function 'base64' must have only one parameter. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64()",
                         typeof(InvalidOperationException),
@@ -28,6 +31,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void InvokingWithTooManyArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:41:30 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-deployment' is not valid: The template language function 'base64' must have only one parameter.Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64('one', 'two')",
                         typeof(InvalidOperationException),
@@ -40,8 +46,11 @@ namespace Kingsland.ArmLinter.Tests
                 }
 
                 [Test]
-                public static void InvokingWithWrongTypeShouldThrow()
+                public static void InvokingWithIntegerShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:51:10 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Integer'. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64(100)",
                         typeof(InvalidOperationException),
@@ -55,6 +64,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void SampleStringShouldEncodeToBase64()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[base64('one, two, three')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     b25lLCB0d28sIHRocmVl
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "base64('one, two, three')",
                         "b25lLCB0d28sIHRocmVl"
@@ -64,6 +81,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void SampleStringShouldRoundtrip()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[base64ToString(base64('one, two, three'))]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     one, two, three
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "base64ToString(base64('one, two, three'))",
                         "one, two, three"
@@ -78,6 +103,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void InvokingWithNoArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:43:56 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test' is not valid: Unable to evaluate template language function 'base64ToString': function requires 1 argument(s) while 0 were provided. Please see https://aka.ms/arm-template-expressions/#base64ToString for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64ToString()",
                         typeof(InvalidOperationException),
@@ -90,6 +118,9 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void InvokingWithTooManyArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:45:42 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'.Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: Unable to evaluate template language function 'base64ToString': function requires 1 argument(s) while 2 were provided. Please see https://aka.ms/arm-template-expressions/#base64ToString for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64ToString('one', 'two')",
                         typeof(InvalidOperationException),
@@ -102,8 +133,11 @@ namespace Kingsland.ArmLinter.Tests
                 }
 
                 [Test]
-                public static void InvokingWithWrongTypeShouldThrow()
+                public static void InvokingWithIntegerShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:55:52 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: The template language function 'base64ToString' expects its parameter to be a string. The provided value is of type 'Integer'. Please see https://aka.ms/arm-template-expressions#base64ToString for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "base64ToString(100)",
                         typeof(InvalidOperationException),
@@ -117,6 +151,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void SampleBase64StringShouldDecodeToOriginalString()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[base64ToString('b25lLCB0d28sIHRocmVl')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     one, two, three
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "base64ToString('b25lLCB0d28sIHRocmVl')",
                         "one, two, three"
@@ -126,6 +168,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void SampleStringShouldRoundtrip()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[base64(base64ToString('b25lLCB0d28sIHRocmVl'))]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     b25lLCB0d28sIHRocmVl
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "base64(base64ToString('b25lLCB0d28sIHRocmVl'))",
                         "b25lLCB0d28sIHRocmVl"
@@ -137,10 +187,12 @@ namespace Kingsland.ArmLinter.Tests
             public static class ConcatTests
             {
 
-
                 [Test]
                 public static void InvokingWithNoArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 20:59:20 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: Unable to evaluate template language function 'concat'. At least one parameter should be provided. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "concat()",
                         typeof(InvalidOperationException),
@@ -157,6 +209,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void OneEmptyStringShouldWork()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('')",
                         ""
@@ -166,6 +226,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void MultipleEmptyStringsShouldWork()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('', '', '')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('', '', '')",
                         ""
@@ -175,6 +243,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void OneStringShouldWork()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('hello')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     hello
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello')",
                         "hello"
@@ -184,6 +260,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void TwoStringsShouldWork()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('hello', 'brave')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     hellobrave
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello', 'brave')",
                         "hellobrave"
@@ -193,6 +277,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyStringsShouldWork_1()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('hello', 'brave', 'new', 'world')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     hellobravenewworld
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello', 'brave', 'new', 'world')",
                         "hellobravenewworld"
@@ -202,6 +294,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void ManyStringsShouldWork_2()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('hello', '', 'brave', '', 'new', '', 'world'))]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     hellobravenewworld
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello', '', 'brave', '', 'new', '', 'world')",
                         "hellobravenewworld"
@@ -211,6 +311,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void NestedConcatShouldWork()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat('hello', concat('brave', 'new'), 'world'))]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     hellobravenewworld
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat('hello', concat('brave', 'new'), 'world')",
                         "hellobravenewworld"
@@ -220,6 +328,14 @@ namespace Kingsland.ArmLinter.Tests
                 [Test]
                 public static void CompoundTest1()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[concat(toLower('ONE'), '-', toUpper('two'), '-', base64('three'))]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     one-TWO-dGhyZWU=
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "concat(toLower('ONE'), '-', toUpper('two'), '-', base64('three'))",
                         "one-TWO-dGhyZWU="
@@ -232,27 +348,105 @@ namespace Kingsland.ArmLinter.Tests
             {
 
                 [Test]
-                public static void ShouldConvertToDataUr_1()
+                public static void InvokingWithNoArgumentsShouldThrow()
                 {
+                    // New-AzResourceGroupDeployment : 21:32:14 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: Unable to evaluate template language function 'dataUri': function requires 1 argument(s) while 0 were provided. Please see https://aka.ms/arm-template-expressions/#dataUri for usage details.. (Code:DeploymentOutputEvaluationFailed)
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "dataUri()",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n"
+                    );
+                }
+
+                [Test]
+                public static void InvokingWithTooManyArgumentsShouldThrow()
+                {
+                    // New-AzResourceGroupDeployment : 21:35:34 - The deployment 'arm_functions' failed with error(s). Showing 1 out of 1 error(s).
+                    // Status Message: Unable to evaluate template outputs: 'test-output'. Please see error details and deployment operations. Please see https://aka.ms/arm-debug for usage details. (Code: DeploymentOutputEvaluationFailed)
+                    //  - The template output 'test-output' is not valid: Unable to evaluate template language function 'dataUri': function requires 1 argument(s) while 2 were provided. Please see https://aka.ms/arm-template-expressions/#dataUri for usage details.. (Code:DeploymentOutputEvaluationFailed)
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
+                        "dataUri('one', 'two')",
+                        typeof(InvalidOperationException),
+                        "No method overloads match the arguments.\r\n" +
+                        "\r\n" +
+                        "Arguments are:\r\n" +
+                        "System.String\r\n" +
+                        "System.String"
+                    );
+                }
+
+                [Test]
+                public static void IntegerShouldConvertToDataUri()
+                {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[dataUri(100)]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     data:application/json;charset=utf8;base64,MTAw
+                    ArmExpressionEvaluatorTests.AssertEvaluatorTest(
+                        "dataUri(100)",
+                        "data:application/json;charset=utf8;base64,MTAw"
+                    );
+                }
+
+                [Test]
+                public static void StringShouldConvertToDataUri_1()
+                {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[dataUri('Hello')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     data:text/plain;charset=utf8;base64,SGVsbG8=
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "dataUri('Hello')",
                         "data:text/plain;charset=utf8;base64,SGVsbG8="
                     );
                 }
 
-
+                /// <summary>
+                /// Example from https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#examples-6
+                /// </summary>
                 [Test]
-                public static void ShouldConvertToDataUri_2()
+                public static void StringShouldConvertToDataUri_2()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[dataUri('GIF87a')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     data:text/plain;charset=utf8;base64,R0lGODdh
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "dataUri('GIF87a')",
                         "data:text/plain;charset=utf8;base64,R0lGODdh"
                     );
                 }
 
+                /// <summary>
+                /// Example from https://en.wikipedia.org/wiki/Data_URI_scheme#Syntax
+                /// </summary>
                 [Test]
-                public static void ShouldConvertToDataUri_3()
+                public static void StringShouldConvertToDataUri_3()
                 {
+                    // "test-output": {
+                    //   "type": "string",
+                    //   "value": "[dataUri('the data:1234,5678')]"
+                    // },
+                    //
+                    // Name             Type                       Value
+                    // ===============  =========================  ==========
+                    // test-output      String                     data:text/plain;charset=utf8;base64,dGhlIGRhdGE6MTIzNCw1Njc4
                     ArmExpressionEvaluatorTests.AssertEvaluatorTest(
                         "dataUri('the data:1234,5678')",
                         "data:text/plain;charset=utf8;base64,dGhlIGRhdGE6MTIzNCw1Njc4"
