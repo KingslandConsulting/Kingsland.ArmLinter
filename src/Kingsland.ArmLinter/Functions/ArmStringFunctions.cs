@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -106,27 +107,42 @@ namespace Kingsland.ArmLinter.Functions
         /// <summary>
         /// Converts a value to a data URI.
         /// </summary>
-        /// <param name="stringToConvert">The value to convert to a data URI.</param>
+        /// <param name="valueToConvert">The value to convert to a data URI.</param>
         /// <returns>A string formatted as a data URI.</returns>
         /// <remarks>
+        /// note - the documentation defines the parameter as "stringToConvert", but the deployment api supports
+        /// integers as well - e.g. "dataUri(100)" => "data:application/json;charset=utf8;base64,MTAw"
         /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#datauri
         /// </remarks>
         /// <example>
         /// DataUri("Hello") => "data:text/plain;charset=utf8;base64,SGVsbG8="
         /// </example>
-        public static string DataUri(string stringToConvert)
+        public static string DataUri(object valueToConvert)
         {
-            if (stringToConvert == null)
+            if (valueToConvert == null)
             {
-                throw new ArgumentNullException(nameof(stringToConvert));
+                throw new ArgumentNullException(nameof(valueToConvert));
             }
             // see https://en.wikipedia.org/wiki/Data_URI_scheme
-            var dataUri = new DataUri(
-                "text/plain",
-                new Dictionary<string, string> { { "charset", "utf8" } },
-                Encoding.UTF8.GetBytes(stringToConvert)
-            );
-            return dataUri.ToString(true);
+            switch (valueToConvert)
+            {
+                case string s:
+                    return new DataUri(
+                        "text/plain",
+                        new Dictionary<string, string> { { "charset", "utf8" } },
+                        Encoding.UTF8.GetBytes(s)
+                    ).ToString(true);
+                case int i:
+                    return new DataUri(
+                        "application/json",
+                        new Dictionary<string, string> { { "charset", "utf8" } },
+                        Encoding.UTF8.GetBytes(
+                            JsonConvert.SerializeObject(i)
+                        )
+                    ).ToString(true);
+                default:
+                    throw new InvalidOperationException();
+            };
         }
 
         #endregion
