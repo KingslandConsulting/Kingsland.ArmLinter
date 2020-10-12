@@ -64,6 +64,14 @@ namespace Kingsland.ArmLinter.Functions
         /// </example>
         public static object[] CreateArray(params object[] args)
         {
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+            if (args.Length < 1)
+            {
+                throw new ArgumentException("At least one parameter should be provided.", nameof(args));
+            }
             return args;
         }
 

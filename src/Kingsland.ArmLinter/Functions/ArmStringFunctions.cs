@@ -132,12 +132,13 @@ namespace Kingsland.ArmLinter.Functions
                         new Dictionary<string, string> { { "charset", "utf8" } },
                         Encoding.UTF8.GetBytes(s)
                     ).ToString(true);
-                case int i:
+                case int _:
+                case long _:
                     return new DataUri(
                         "application/json",
                         new Dictionary<string, string> { { "charset", "utf8" } },
                         Encoding.UTF8.GetBytes(
-                            JsonConvert.SerializeObject(i)
+                            JsonConvert.SerializeObject(valueToConvert)
                         )
                     ).ToString(true);
                 default:
@@ -155,12 +156,14 @@ namespace Kingsland.ArmLinter.Functions
         /// <param name="dataUriToConvert">The data URI value to convert.</param>
         /// <returns>A string containing the converted value.</returns>
         /// <remarks>
+        /// note - the documentation defines the return type as "string", but the deployment api supports
+        /// integers as well - e.g. "dataUri(100)" => "data:application/json;charset=utf8;base64,MTAw"
         /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#datauritostring
         /// </remarks>
         /// <example>
         /// DateUriToString("data:;base64,SGVsbG8sIFdvcmxkIQ==") => "Hello, World!"
         /// </example>
-        public static string DataUriToString(string stringToConvert)
+        public static object DataUriToString(string stringToConvert)
         {
             if (stringToConvert == null)
             {
@@ -172,10 +175,27 @@ namespace Kingsland.ArmLinter.Functions
             {
                 encoding = encodingName switch
                 {
-                    "utf8" => Encoding.UTF8,
+                    "utf8" =>
+                        // see https://github.com/Azure/azure-powershell/issues/13179
+                        // the "dataUri" function generates strings with "charset=utf8", but
+                        // "dataUriToString" doesn't recognize this encoding, so we'll
+                        // replicate the behaviour for now
+                        throw new NotSupportedException($"The provided charset '{encodingName}' is not supported."),
                     "UTF-8" => Encoding.UTF8,
-                    _ => throw new InvalidOperationException()
+                    _ =>
+                        throw new NotSupportedException($"The provided charset '{encodingName}' is not supported.")
                 };
+            }
+            var stringValue = encoding.GetString(dataUri.Data);
+            var mediaType = string.IsNullOrEmpty(dataUri.MediaType) ? "text/plain" : dataUri.MediaType;
+            switch (mediaType)
+            {
+                case "text/plain":
+                    return stringValue;
+                case "application/json":
+                    return JsonConvert.DeserializeObject(stringValue);
+                default:
+                    throw new InvalidOperationException($"unsupported media type '{dataUri.MediaType}'");
             }
             return encoding.GetString(dataUri.Data);
         }
