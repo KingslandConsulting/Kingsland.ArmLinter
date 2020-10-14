@@ -54,18 +54,23 @@ namespace Kingsland.ArmLinter.Functions
         {
             if (!_functionBindings.ContainsKey(name))
             {
-                throw new NotImplementedException($"The ARM Template function '{name}' is not implemented.");
+                throw new InvalidOperationException($"The template function '{name}' is not valid.");
             }
             var functionInfo = _functionBindings[name];
-            if (!BindingHelper.TryBindParameters(functionInfo, args, out var convertedArgs))
+            if (!BindingHelper.TryBindParameters(name, functionInfo, args, out var convertedArgs, out var errorMessage))
             {
-                var message = "No method overloads match the arguments.\r\n" +
-                    "\r\n" +
-                    "Arguments are:\r\n" +
-                    string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
-                throw new InvalidOperationException(message);
+                throw new InvalidOperationException(errorMessage);
             }
-            return functionInfo.Invoke(null, convertedArgs);
+            try
+            {
+                return functionInfo.Invoke(null, convertedArgs);
+            }
+            catch (TargetInvocationException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to evaluate template language function '{name}'. {ex.InnerException.Message}"
+                );
+            }
         }
 
         /// <summary>
@@ -73,9 +78,11 @@ namespace Kingsland.ArmLinter.Functions
         /// invoke a MethodInfo with. Returns true if the arguments can be used with the
         /// MethodInfo, otherwise returns false.
         /// </summary>
-        /// <param name="methodInfo"></param>
+        /// <param name="functionName"></param>
+        /// <param name="functionInfo"></param>
         /// <param name="argsIn"></param>
         /// <param name="argsOut"></param>
+        /// <param name="errorMessage"></param>
         /// <returns>
         /// Given a MethodInfo and a list of arguments, this function checks if the arguments satisfy the
         /// type signature of the method and returns true if they do, otherwise returns false.
@@ -92,15 +99,15 @@ namespace Kingsland.ArmLinter.Functions
         /// + Converting array arguments where the element type needs to be different
         ///
         /// </returns>
-        internal static bool TryBindParameters(MethodInfo methodInfo, object[] argsIn, out object[] argsOut)
+        internal static bool TryBindParameters(string functionName, MethodInfo functionInfo, object[] argsIn, out object[] argsOut, out string errorMessage)
         {
 
-            if (methodInfo == null)
+            if (functionInfo == null)
             {
-                throw new ArgumentNullException(nameof(methodInfo));
+                throw new ArgumentNullException(nameof(functionInfo));
             }
 
-            var parameters = methodInfo.GetParameters();
+            var parameters = functionInfo.GetParameters();
             var newArgs = new List<object>(argsIn);
 
             var parameterIndex = 0;
@@ -120,7 +127,7 @@ namespace Kingsland.ArmLinter.Functions
                     }
 
                     // convert the params array
-                    if(
+                    if (
                         !BindingHelper.TryConvertArray(
                             argsIn.Skip(parameterIndex).ToArray(),
                             parameter.ParameterType.GetElementType(),
@@ -129,6 +136,7 @@ namespace Kingsland.ArmLinter.Functions
                     )
                     {
                         argsOut = null;
+                        errorMessage = "params error";
                         return false;
                     }
 
@@ -139,7 +147,6 @@ namespace Kingsland.ArmLinter.Functions
                 }
                 else if (newArgs.Count <= parameterIndex)
                 {
-
                     // if there's no argument for this parameter we can
                     // see if it has a default value and use that
                     if (parameter.HasDefaultValue)
@@ -149,6 +156,9 @@ namespace Kingsland.ArmLinter.Functions
                     else
                     {
                         argsOut = null;
+                        errorMessage = BindingHelper.GetArgumentCountError(
+                            functionName, parameters.Length, argsIn.Length
+                        );
                         return false;
                     }
                 }
@@ -161,6 +171,9 @@ namespace Kingsland.ArmLinter.Functions
                 {
                     // we couldn't convert the argument type to match the parameter type
                     argsOut = null;
+                    errorMessage = BindingHelper.GetArgumentTypeMismatchErrorMessage(
+                        functionName, functionInfo, argsIn
+                    ); ;
                     return false;
                 }
 
@@ -174,11 +187,15 @@ namespace Kingsland.ArmLinter.Functions
             if (newArgs.Count != parameters.Length)
             {
                 argsOut = null;
+                errorMessage = BindingHelper.GetArgumentCountError(
+                    functionName, parameters.Length, argsIn.Length
+                );
                 return false;
             }
 
             // everything look ok
             argsOut = newArgs.ToArray();
+            errorMessage = null;
             return true;
 
         }
@@ -270,6 +287,83 @@ namespace Kingsland.ArmLinter.Functions
             }
             convertedArray = tmpArray;
             return true;
+        }
+
+        private static string GetArgumentTypeMismatchErrorMessage(string functionName, MethodInfo functionInfo, object[] args)
+        {
+            static string MapTypeName(Type type)
+            {
+                return type switch
+                {
+                    Type t when t == typeof(string) =>
+                        "String",
+                    Type t when t == typeof(int) =>
+                        "Integer",
+                    Type t when t.IsArray =>
+                        "Array",
+                    _ => type.Name
+                };
+            }
+            var parameters = functionInfo.GetParameters();
+            switch (parameters.Length)
+            {
+                case 0:
+                    throw new InvalidOperationException();
+                case 1:
+                    // there's two slightly different forms to this error message - e.g.:
+                    //
+                    //   + "The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Array'."
+                    //   + "The template language function 'base64ToString' expects its parameter to be a string. The provided value is of type 'Integer'."
+                    //
+                    // "The template language function 'length' expects exactly one parameter: an array, object, or a string the length of which is returned. The function was invoked with '2' parameters."
+                    switch (functionName)
+                    {
+                        case "base64ToString":
+                        case "dataUriToString":
+                        case "first":
+                            return
+                                $"The template language function '{functionName}' expects its parameter to be a {parameters[0].ParameterType.Name.ToLowerInvariant()}. " +
+                                $"The provided value is of type '{MapTypeName(args[0].GetType())}'.";
+                        default:
+                            return
+                                $"The template language function '{functionName}' expects its parameter to be of type '{parameters[0].ParameterType.Name}'. " +
+                                $"The provided value is of type '{MapTypeName(args[0].GetType())}'.";
+                    }
+                default:
+                    // there's two slightly different forms to this error message - e.g.:
+                    //
+                    //   + "The template language function 'endsWith' expects its parameters to be of type string and string. The provided value is of type 'Integer' and 'Integer'."
+                    switch (functionName)
+                    {
+                        case "endsWith":
+                        case "indexOf":
+                        case "lastIndexOf":
+                            return
+                                $"The template language function '{functionName}' expects its parameters to be of type " +
+                                string.Join(" and ", parameters.Select(p => p.ParameterType.Name.ToLowerInvariant())) + ". " +
+                                $"The provided value is of type " +
+                                string.Join(" and ", args.Select(a => $"'{MapTypeName(a.GetType())}'")) + ".";
+                        default:
+                            return
+                                $"The template language function '{functionName}' expects its parameters to be of type " +
+                                string.Join(" and ", parameters.Select(p => MapTypeName(p.ParameterType))) + ". " +
+                                $"The provided value is of type " +
+                                string.Join(" and ", args.Select(a => $"'{MapTypeName(a.GetType())}'")) + ". ";
+                    }
+            };
+        }
+
+        private static string GetArgumentCountError(string functionName, int parameterCount, int argCount)
+        {
+            switch (functionName)
+            {
+                case "base64":
+                    return $"The template language function '{functionName}' must have only one parameter.";
+                default:
+                    return
+                        $"Unable to evaluate template language function '{functionName}': " +
+                        $"function requires {parameterCount} argument(s) while {argCount} were provided.";
+            };
         }
 
     }
