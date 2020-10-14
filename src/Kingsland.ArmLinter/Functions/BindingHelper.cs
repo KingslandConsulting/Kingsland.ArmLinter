@@ -12,117 +12,38 @@ namespace Kingsland.ArmLinter.Functions
     internal static class BindingHelper
     {
 
-        // example error message from the Azure Resource Manager:
-        //
-        // not enough arguments - e.g. "[base64()]"
-        // too many arguments - e.g. "[base64('one', 'two')]"
-        // wrong type *and* wrong number - e.g. "[base64(100, 100)]"
-        //   New-AzResourceGroupDeployment: 21:32:16 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'no_parameters' is not valid: The template language function 'base64' must have only one parameter. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: e07fb1b6-ff5e-4eab-b194-1e9812cad025
-        //
-        // base64ToString gives a slightly different error with more detail - e.g. "base64ToString()":
-        //   New-AzResourceGroupDeployment: 21:56:01 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: Unable to evaluate template language function 'base64ToString': function requires 1 argument(s) while 2 were provided.Please see https://aka.ms/arm-template-expressions/#base64ToString for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: 8ccf15a8-434e-4fb8-931e-0c25ffb08988
-        //
-        // concat (with variable number of args) gives a different error again - e.g. "concat()":
-        //   New-AzResourceGroupDeployment: 22:02:45 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: Unable to evaluate template language function 'concat'. At least one parameter should be provided.Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: 583fc4b5-e29f-4914-a143-fa523df00786
-        //
-        // correct number of arguments but wrong type - e.g. "[base64(100)]"
-        //   New-AzResourceGroupDeployment: 21:47:06 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Integer'. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: 473dd259-9f48-4dab-b438-db789cd566ee
-        //
-        // correct number of arguments but wrong type - e.g. "[base64(createArray(100, 100))]"
-        //   New-AzResourceGroupDeployment: 21:49:50 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template language function 'base64' expects its parameter to be of type 'String'. The provided value is of type 'Array'. Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: 604e8dd3-0ad0-4edc-b202-18d1ba7c8f14
-        //
-        // non-existent function - e.g. "[nonexistent()]"
-        //   New-AzResourceGroupDeployment: 21:50:43 - The deployment 'arm_functions_string_base64' failed with error(s). Showing 1 out of 1 error(s).
-        //   Status Message: The template output 'docs_microsoft_com_example_base64Output' is not valid: The template function 'nonexistent' is not valid.Please see https://aka.ms/arm-template-expressions for usage details.. (Code:DeploymentOutputEvaluationFailed)
-        //   CorrelationId: 215d46ea-150e-410f-9996-5ce302b0ef81
-
-
-        private static readonly Dictionary<string, MethodInfo[]> _functionBindings = new Dictionary<string, MethodInfo[]>
+        private static readonly Dictionary<string, MethodInfo> _functionBindings = new Dictionary<string, MethodInfo>
         {
-            { "base64", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64))
-            }},
-            { "base64ToString", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString))
-            }},
-            { "createArray", new [] {
-                typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.CreateArray))
-            }},
-            { "concat", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)),
-                typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat))
-            }},
-            { "dataUri", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUri))
-            }},
-            { "dataUriToString", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUriToString))
-            }},
-            { "empty", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Empty))
-            }},
-            { "endsWith", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith))
-            }},
-            { "first", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.First))
-            }},
-            { "format", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Format))
-            }},
-            { "indexOf", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.IndexOf))
-            }},
-            { "last", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Last))
-            }},
-            { "length", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Length))
-            }},
-            { "lastIndexOf", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.LastIndexOf))
-            }},
-            { "padLeft", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft))
-            }},
-            { "replace", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Replace))
-            }},
-            { "split", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split), new Type[] { typeof(string), typeof(string) }),
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split), new Type[] { typeof(string), typeof(string[]) })
-            }},
-            { "skip", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Skip))
-            }},
-            { "startsWith", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith))
-            }},
-            { "substring", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Substring))
-            }},
-            { "take", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Take))
-            }},
-            { "trim", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Trim))
-            }},
-            { "toLower", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower))
-            }},
-            { "toUpper", new [] {
-                typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToUpper))
-            }}
+
+            // array functions
+            { "createArray", typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.CreateArray)) },
+            //{ "concat", typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat)) },
+
+            // string functions
+            { "base64", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64)) },
+            { "base64ToString", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString)) },
+            { "concat", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)) },
+            { "dataUri", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUri)) },
+            { "dataUriToString", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUriToString)) },
+            { "empty", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Empty)) },
+            { "endsWith", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith)) },
+            { "first", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.First)) },
+            { "format", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Format)) },
+            { "indexOf", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.IndexOf)) },
+            { "last", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Last)) },
+            { "length", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Length)) },
+            { "lastIndexOf", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.LastIndexOf)) },
+            { "padLeft", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft)) },
+            { "replace", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Replace)) },
+            { "split", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split)) },
+            { "skip", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Skip)) },
+            { "startsWith", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith)) },
+            { "substring", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Substring)) },
+            { "take", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Take)) },
+            { "trim", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Trim)) },
+            { "toLower", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower)) },
+            { "toUpper", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToUpper)) }
+
         };
 
         /// <summary>
@@ -135,8 +56,8 @@ namespace Kingsland.ArmLinter.Functions
             {
                 throw new NotImplementedException($"The ARM Template function '{name}' is not implemented.");
             }
-            var matches = BindingHelper.BindMethodInfos(_functionBindings[name], args).ToList();
-            if (matches.Count == 0)
+            var functionInfo = _functionBindings[name];
+            if (!BindingHelper.TryBindParameters(functionInfo, args, out var convertedArgs))
             {
                 var message = "No method overloads match the arguments.\r\n" +
                     "\r\n" +
@@ -144,30 +65,7 @@ namespace Kingsland.ArmLinter.Functions
                     string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
                 throw new InvalidOperationException(message);
             }
-            if (matches.Count > 1)
-            {
-                var message = "More than one method overload matches the arguments.\r\n" +
-                    "\r\n" +
-                    "Overloads are:\r\n" +
-                    string.Join("\r\n", _functionBindings[name].Select(m => m.ToString())) + "\r\n" +
-                    "\r\n" +
-                    "Arguments are:\r\n" +
-                    string.Join("\r\n", args.Select(arg => arg.GetType().ToString()));
-                throw new InvalidOperationException(message);
-            }
-            return matches[0].MethodInfo.Invoke(null, matches[0].Args);
-        }
-
-        internal static IEnumerable<(MethodInfo MethodInfo, object[] Args)> BindMethodInfos(IEnumerable<MethodInfo> methodInfos, object[] args)
-        {
-            return methodInfos
-                .Select(
-                    m => (
-                        MethodInfo: m,
-                        Args: BindingHelper.TryBindParameters(m, args, out var argsOut) ?
-                            argsOut : null
-                    )
-                ).Where(x => x.Args != null);
+            return functionInfo.Invoke(null, convertedArgs);
         }
 
         /// <summary>

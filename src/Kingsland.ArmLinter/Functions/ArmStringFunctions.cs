@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Kingsland.ArmLinter.Functions
@@ -76,28 +77,62 @@ namespace Kingsland.ArmLinter.Functions
         #region Concat
 
         /// <summary>
-        /// Combines multiple string values and returns the concatenated string.
+        /// Combines multiple string values and returns the concatenated string, or
+        /// combines multiple arrays and returns the concatenated array.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">Strings or arrays in sequential order for concatenation.</param>
         /// <returns>A string of concatenated values.</returns>
         /// <remarks>
-        /// This function can take any number of arguments, and can accept strings for the parameters.
+        /// This function can take any number of arguments, and can accept either strings
+        /// or arrays for the parameters. However, you can't provide both arrays and
+        /// strings for parameters. Strings are only concatenated with other strings.
         /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#concat
         /// </remarks>
         /// <example>
         /// Concat("prefix", "-", "suffix") => "prefix-suffix"
         /// </example>
-        public static string Concat(params string[] args)
+        /// <example>
+        /// Concat(
+        ///     new object[] { "1-1", "1-2", "1-3" },
+        ///     new object[] { "2-1", "2-2", "2-3" }
+        /// ) => new object[] {
+        ///     "1-1", "1-2", "1-3",
+        ///     "2-1", "2-2", "2-3"
+        /// }
+        /// </example>
+        public static object Concat(params object[] args)
         {
+
+            // "concat()" throws "At least one parameter should be provided."
             if (args == null)
             {
-                throw new ArgumentNullException(nameof(args));
+                throw new ArgumentException($"At least one parameter should be provided.");
             }
             if (args.Length == 0)
             {
-                throw new ArgumentException($"{nameof(Concat)} requires at least one parameter.");
+                throw new ArgumentException($"At least one parameter should be provided.");
             }
-            return string.Join(string.Empty, args);
+
+            // "concat(createArray('hello', 100), 200)" throws "Either all or none of the parameters must be an array."
+            var arrayCount = args.Count(item => item.GetType().IsArray);
+            if ((arrayCount > 0) && (arrayCount < args.Length))
+            {
+                throw new ArgumentException($"Either all or none of the parameters must be an array.");
+            }
+
+            if (arrayCount == 0)
+            {
+                // concatenate values into a string
+                return string.Join(string.Empty, args);
+            }
+            else
+            {
+                // collapse array items into a single
+                return args.Cast<Array>()
+                    .SelectMany(arr => arr.Cast<object>())
+                    .ToArray();
+            }
+
         }
 
         #endregion
@@ -541,27 +576,6 @@ namespace Kingsland.ArmLinter.Functions
         /// </summary>
         /// <returns>An array of strings.</returns>
         /// <param name="inputString">The string to split.</param>
-        /// <param name="delimiter">The delimiter to use for splitting the string.</param>
-        /// <remarks>
-        /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#split
-        /// </remarks>
-        /// <example>
-        /// Split("one,two,three", ",") => new string[] { "one", "two", "three" }
-        /// </example>
-        public static string[] Split(string inputString, string delimiter)
-        {
-            if (inputString == null)
-            {
-                throw new ArgumentNullException(nameof(inputString));
-            }
-            return inputString.Split(delimiter);
-        }
-
-        /// <summary>
-        /// Returns an array of strings that contains the substrings of the input string that are delimited by the specified delimiters.
-        /// </summary>
-        /// <returns>An array of strings.</returns>
-        /// <param name="inputString">The string to split.</param>
         /// <param name="delimiters">The delimiters to use for splitting the string.</param>
         /// <remarks>
         /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-string#split
@@ -569,13 +583,36 @@ namespace Kingsland.ArmLinter.Functions
         /// <example>
         /// Split("one,two,three", ",") => new string[] { "one", "two", "three" }
         /// </example>
-        public static string[] Split(string inputString, string[] delimiters)
+        /// <example>
+        /// Split("one;two,three", new string[] { ",", ";" }) => new string[] { "one", "two", "three" }
+        /// </example>
+        public static string[] Split(string inputString, object delimiters)
         {
             if (inputString == null)
             {
-                throw new ArgumentNullException(nameof(inputString));
+                throw new ArgumentException($"At least one parameter should be provided.");
             }
-            return inputString.Split(delimiters, StringSplitOptions.None);
+            if (delimiters == null)
+            {
+                throw new ArgumentException($"At least one parameter should be provided.");
+            }
+            switch (delimiters)
+            {
+                case string separator:
+                    return inputString.Split(separator, StringSplitOptions.None);
+                case object[] separators:
+                    if (separators.Length == 0)
+                    {
+                        throw new ArgumentException($"At least one parameter should be provided.");
+                    }
+                    if (!BindingHelper.TryConvertArray(separators, typeof(char), out var converted))
+                    {
+                        throw new InvalidOperationException($"The template language function 'split' expects its second parameter to be of type 'String or Array of Strings'");
+                    }
+                    return inputString.Split((char[])converted, StringSplitOptions.None);
+                default:
+                    throw new InvalidOperationException($"The template language function 'split' expects its second parameter to be of type 'String or Array of Strings'");
+            }
         }
 
         #endregion
