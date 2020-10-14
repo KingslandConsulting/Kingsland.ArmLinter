@@ -14,7 +14,6 @@ namespace Kingsland.ArmLinter.Tests
             {
 
                 [Test]
-                [Ignore("Needs some work to BindingHelper to fix")]
                 public static void InvokingWithNoArgumentsShouldThrow()
                 {
                     // "test-output": {
@@ -28,10 +27,7 @@ namespace Kingsland.ArmLinter.Tests
                     ArmExpressionEvaluatorTests.AssertEvaluatorTestThrows(
                         "createArray()",
                         typeof(InvalidOperationException),
-                        "No method overloads match the arguments.\r\n" +
-                        "\r\n" +
-                        "Arguments are:\r\n" +
-                        "System.Object[]"
+                        "Unable to evaluate template language function 'createArray'. At least one parameter should be provided."
                     );
                 }
 
@@ -61,11 +57,10 @@ namespace Kingsland.ArmLinter.Tests
                 /// <summary>
                 /// note - "[empty(createArray())]" throws an exception because createArray
                 /// requires at lease one parameter. we *can* however, create an empty array
-                /// by intersecting two arrays with an empty conjunction, hence
+                /// by intersecting two arrays that hav an empty conjunction, hence
                 /// "[empty(intersection(createArray('aaa'), createArray('bbb')))]"
                 /// </summary>
                 [Test]
-                [Ignore("intersection function not implemented yet")]
                 public static void EmptyArrayShouldReturnTrue()
                 {
                     // "test-output": {
