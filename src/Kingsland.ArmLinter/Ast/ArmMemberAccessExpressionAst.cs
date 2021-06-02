@@ -48,7 +48,7 @@ namespace Kingsland.ArmLinter.Ast
             switch (this.OperatorToken)
             {
                 case DotOperatorToken _:
-                    result.Append(".");
+                    result.Append('.');
                     break;
                 default:
                     throw new NotImplementedException();

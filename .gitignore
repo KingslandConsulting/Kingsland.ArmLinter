@@ -7,4 +7,6 @@ fusion
 *.nupkg
 *.user
 
+launchSettings.json
+
 build/TestResult.xml
