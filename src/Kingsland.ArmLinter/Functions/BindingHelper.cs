@@ -14,36 +14,31 @@ namespace Kingsland.ArmLinter.Functions
 
         private static readonly Dictionary<string, MethodInfo> _functionBindings = new Dictionary<string, MethodInfo>
         {
-
-            // array functions
-            { "createArray", typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.CreateArray)) },
-            //{ "concat", typeof(ArmArrayFunctions).GetMethod(nameof(ArmArrayFunctions.Concat)) },
-
-            // string functions
-            { "base64", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64)) },
-            { "base64ToString", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Base64ToString)) },
-            { "concat", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Concat)) },
-            { "dataUri", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUri)) },
-            { "dataUriToString", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.DataUriToString)) },
-            { "empty", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Empty)) },
-            { "endsWith", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.EndsWith)) },
-            { "first", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.First)) },
-            { "format", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Format)) },
-            { "indexOf", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.IndexOf)) },
-            { "last", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Last)) },
-            { "length", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Length)) },
-            { "lastIndexOf", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.LastIndexOf)) },
-            { "padLeft", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.PadLeft)) },
-            { "replace", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Replace)) },
-            { "split", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Split)) },
-            { "skip", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Skip)) },
-            { "startsWith", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.StartsWith)) },
-            { "substring", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Substring)) },
-            { "take", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Take)) },
-            { "trim", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.Trim)) },
-            { "toLower", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToLower)) },
-            { "toUpper", typeof(ArmStringFunctions).GetMethod(nameof(ArmStringFunctions.ToUpper)) }
-
+            { "base64", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.Base64Binder)) },
+            { "base64ToString", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.Base64ToStringBinder)) },
+            { "concat", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.ConcatBinder)) },
+            { "createArray", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.CreateArray)) },
+            { "dataUri", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.DataUriBinder)) },
+            { "dataUriToString", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.DataUriToStringBinder)) },
+            { "empty", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.EmptyBinder)) },
+            { "endsWith", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.EndsWithBinder)) },
+            { "first", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.FirstBinder)) },
+            { "format", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.FormatBinder)) },
+            { "indexOf", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.IndexOfBinder)) },
+            { "intersection", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.IntersectionBinder)) },
+            { "last", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.LastBinder)) },
+            { "length", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.LengthBinder)) },
+            { "lastIndexOf", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.LastIndexOfBinder)) },
+            { "padLeft", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.PadLeftBinder)) },
+            { "replace", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.ReplaceBinder)) },
+            { "skip", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.SkipBinder)) },
+            { "split", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.SplitBinder)) },
+            { "startsWith", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.StartsWithBinder)) },
+            { "substring", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.SubstringBinder)) },
+            { "take", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.TakeBinder)) },
+            { "toLower", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.ToLowerBinder)) },
+            { "toUpper", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.ToUpperBinder)) },
+            { "trim", typeof(ArmFunctions).GetMethod(nameof(ArmFunctions.TrimBinder)) }
         };
 
         /// <summary>
@@ -57,19 +52,21 @@ namespace Kingsland.ArmLinter.Functions
                 throw new InvalidOperationException($"The template function '{name}' is not valid.");
             }
             var functionInfo = _functionBindings[name];
-            if (!BindingHelper.TryBindParameters(name, functionInfo, args, out var convertedArgs, out var errorMessage))
-            {
-                throw new InvalidOperationException(errorMessage);
-            }
+            //if (!BindingHelper.TryBindParameters(name, functionInfo, args, out var convertedArgs, out var errorMessage))
+            //{
+            //    throw new InvalidOperationException(errorMessage);
+            //}
             try
             {
-                return functionInfo.Invoke(null, convertedArgs);
+                return functionInfo.Invoke(null, new object[] { args });
             }
             catch (TargetInvocationException ex)
             {
-                throw new InvalidOperationException(
-                    $"Unable to evaluate template language function '{name}'. {ex.InnerException.Message}"
-                );
+                //throw new InvalidOperationException(
+                //    $"Unable to evaluate template language function '{name}'. {ex.InnerException.Message}"
+                //);
+                //throw new InvalidOperationException(ex.InnerException.Message);
+                throw ex.InnerException;
             }
         }
 
@@ -173,7 +170,7 @@ namespace Kingsland.ArmLinter.Functions
                     argsOut = null;
                     errorMessage = BindingHelper.GetArgumentTypeMismatchErrorMessage(
                         functionName, functionInfo, argsIn
-                    ); ;
+                    );
                     return false;
                 }
 
@@ -254,6 +251,34 @@ namespace Kingsland.ArmLinter.Functions
             return false;
         }
 
+        public delegate bool TypeConverter<TIn, TOut>(TIn argIn, out TOut argOut);
+
+        internal static bool TryConvertArray<TIn, TOut>(Array originalArray, TypeConverter<TIn, TOut> typeConverter, out TOut[] convertedArray)
+        {
+            // if the original array is the corret type, just return that
+            if (originalArray is TOut[] castArray)
+            {
+                convertedArray = castArray;
+                return true;
+            }
+            // otherwise, see if we can convert each element
+            var tmpArray = (TOut[])Array.CreateInstance(typeof(TOut), originalArray.Length);
+            for (var index = 0; index < originalArray.Length; index++)
+            {
+                if (typeConverter((TIn)originalArray.GetValue(index), out var convertedValue))
+                {
+                    tmpArray.SetValue(convertedValue, index);
+                }
+                else
+                {
+                    convertedArray = null;
+                    return false;
+                }
+            }
+            convertedArray = tmpArray;
+            return true;
+        }
+
         /// <summary>
         /// A poor-mans's contravariance / covariance implementation. Given an
         /// array of one type of element, TryConvertArray attempts to convert
@@ -270,12 +295,47 @@ namespace Kingsland.ArmLinter.Functions
         /// <remarks>
         /// See https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#:~:text=Covariance%20and%20contravariance%20are%20terms,assigning%20and%20using%20generic%20types.
         /// </remarks>
-        internal static bool TryConvertArray(Array originalArray, Type elementType, out object convertedArray)
+        internal static bool TryConvertArray(Array originalArray, Type elementType, out Array convertedArray)
         {
             var tmpArray = Array.CreateInstance(elementType, originalArray.Length);
             for (var index = 0; index < originalArray.Length; index++)
             {
                 if (BindingHelper.TryConvertValue(originalArray.GetValue(index), elementType, out var convertedValue))
+                {
+                    tmpArray.SetValue(convertedValue, index);
+                }
+                else
+                {
+                    convertedArray = null;
+                    return false;
+                }
+            }
+            convertedArray = tmpArray;
+            return true;
+        }
+
+        /// <summary>
+        /// A poor-mans's contravariance / covariance implementation. Given an
+        /// array of one type of element, TryConvertArray attempts to convert
+        /// it into an array of another compatible type.
+        ///
+        /// For example, given a string[] we can convert it into an object[].
+        /// And, given an object[] where all the items are strings, we can
+        /// convert it into a string[].
+        /// </summary>
+        /// <param name="originalArray"></param>
+        /// <param name="elementType"></param>
+        /// <param name="convertedArray"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance#:~:text=Covariance%20and%20contravariance%20are%20terms,assigning%20and%20using%20generic%20types.
+        /// </remarks>
+        internal static bool TryConvertArray<TOut>(Array originalArray, out TOut[] convertedArray)
+        {
+            var tmpArray = new TOut[originalArray.Length];
+            for (var index = 0; index < originalArray.Length; index++)
+            {
+                if (BindingHelper.TryConvertValue(originalArray.GetValue(index), typeof(TOut), out var convertedValue))
                 {
                     tmpArray.SetValue(convertedValue, index);
                 }
