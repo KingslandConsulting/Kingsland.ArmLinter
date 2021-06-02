@@ -1,26 +1,34 @@
 ﻿using System;
-using System.Linq;
 
 namespace Kingsland.ArmLinter.Functions
 {
 
     /// <summary>
-    /// Implementation of built-in ARM Template Array functions.
+    /// Implementation of built-in ARM Template functions.
     /// See https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-array
     /// </summary>
-    public static class ArmArrayFunctions
+    public static partial class ArmFunctions
     {
 
-        #region Concat
-
-        //public static object Concat(params object[][] args)
-        //{
-        //    return ArmStringFunctions.Concat(args);
-        //}
-
-        #endregion
-
         #region CreateArray
+
+
+        public static object[] CreateArrayBinder(object[] functionArgs)
+        {
+
+            const string functionName = "createArray";
+
+            // throw for incorrect number of arguments
+            ArgHelper.AssertArgumentsNotNull(functionName, functionArgs);
+
+            // unbundle the function arguments
+            var args = functionArgs;
+
+            return ArmFunctions.CreateArray(
+                args
+            );
+
+        }
 
         /// <summary>
         /// Creates an array from the parameters.
@@ -43,10 +51,6 @@ namespace Kingsland.ArmLinter.Functions
             if (args == null)
             {
                 throw new ArgumentNullException(nameof(args));
-            }
-            if (args.Length < 1)
-            {
-                throw new ArgumentException("At least one parameter should be provided.");
             }
             return args;
         }

@@ -21,7 +21,9 @@ namespace Kingsland.ArmLinter.Tests.Functions
                 var actual = DataUri.Parse("data:text/plain;charset=utf8;base64,SGVsbG8=");
                 var expected = new DataUri(
                     mediaType: "text/plain",
-                    parameters: new Dictionary<string, string> { { "charset", "utf8" } },
+                    parameters: new Dictionary<string, string> {
+                        { "charset", "utf8" }
+                    },
                     data: Encoding.UTF8.GetBytes("Hello")
                 );
                 Assert.AreEqual(expected.MediaType, actual.MediaType);
@@ -55,7 +57,9 @@ namespace Kingsland.ArmLinter.Tests.Functions
                 var actual = DataUri.Parse("data:text/vnd-example+xyz;foo=bar;base64,R0lGODdh");
                 var expected = new DataUri(
                     mediaType: "text/vnd-example+xyz",
-                    parameters: new Dictionary<string, string> { { "foo", "bar" } },
+                    parameters: new Dictionary<string, string> {
+                        { "foo", "bar" }
+                    },
                     data: Encoding.ASCII.GetBytes("GIF87a")
                 );
                 Assert.AreEqual(expected.MediaType, actual.MediaType);
